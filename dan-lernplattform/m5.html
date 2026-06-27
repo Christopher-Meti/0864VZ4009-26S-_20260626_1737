@@ -396,6 +396,7 @@ function m5_ans(ch,co) {
   document.getElementById('m5nav').classList.add('show');
 }
 function m5_showModel() { document.getElementById('m5model').classList.toggle('show'); }
+function toggleC(id) { document.getElementById(id).classList.toggle('open'); }
 (function(){
   if(window.DAN&&DAN.isDone(5)){
     const b=document.getElementById('doneBadge_5');if(b)b.innerHTML='<span class="done-badge">✅ Abgeschlossen!</span>';

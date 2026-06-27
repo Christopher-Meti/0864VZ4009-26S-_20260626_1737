@@ -266,6 +266,7 @@ function m3_ans(ch, co) {
   document.getElementById('m3nav').classList.add('show');
 }
 function m3_showModel() { document.getElementById('m3model').classList.toggle('show'); }
+function toggleC(id) { document.getElementById(id).classList.toggle('open'); }
 (function(){
   if(window.DAN&&DAN.isDone(3)){
     const b=document.getElementById('doneBadge_3');if(b)b.innerHTML='<span class="done-badge">✅ Modul abgeschlossen!</span>';

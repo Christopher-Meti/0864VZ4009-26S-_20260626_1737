@@ -246,6 +246,7 @@ function m4_ans(ch,co) {
   document.getElementById('m4nav').classList.add('show');
 }
 function m4_showModel() { document.getElementById('m4model').classList.toggle('show'); }
+function toggleC(id) { document.getElementById(id).classList.toggle('open'); }
 (function(){
   if(window.DAN&&DAN.isDone(4)){
     const b=document.getElementById('doneBadge_4');if(b)b.innerHTML='<span class="done-badge">✅ Abgeschlossen!</span>';

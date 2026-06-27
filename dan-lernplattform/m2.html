@@ -337,6 +337,7 @@ function m2_answer(chosen, correct) {
   document.getElementById('m2nav').classList.add('show');
 }
 function m2_showModel() { document.getElementById('m2model').classList.toggle('show'); }
+function toggleC(id) { document.getElementById(id).classList.toggle('open'); }
 
 (function(){
   if (window.DAN && DAN.isDone(2)) {

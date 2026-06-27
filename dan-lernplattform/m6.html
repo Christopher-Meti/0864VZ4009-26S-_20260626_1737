@@ -395,6 +395,7 @@ function m6_ans(ch,co) {
   document.getElementById('m6nav').classList.add('show');
 }
 function m6_showModel() { document.getElementById('m6model').classList.toggle('show'); }
+function toggleC(id) { document.getElementById(id).classList.toggle('open'); }
 (function(){
   if(window.DAN&&DAN.isDone(6)){
     const b=document.getElementById('doneBadge_6');if(b)b.innerHTML='<span class="done-badge">🏆 Plattform abgeschlossen!</span>';
