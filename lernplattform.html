@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DAN Lernplattform — Prüfung 29.06.2026</title>
+<style>
+  :root {
+    --yellow: #F5C800;
+    --purple: #3B2D6E;
+    --dark: #1a1a2e;
+    --card: #ffffff;
+    --bg: #f0f2f8;
+    --text: #1a1a2e;
+    --muted: #6b7280;
+    --green: #16a34a;
+    --red: #dc2626;
+    --border: #e5e7eb;
+    --shadow: 0 2px 12px rgba(0,0,0,0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  /* HEADER */
+  header {
+    background: linear-gradient(135deg, var(--purple) 60%, #5a3fa0 100%);
+    color: white; padding: 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    position: sticky; top: 0; z-index: 100;
+  }
+  .header-inner { display: flex; align-items: center; justify-content: space-between; padding: 12px 24px; }
+  .logo { font-size: 1.1rem; font-weight: 700; letter-spacing: 0.5px; }
+  .logo span { color: var(--yellow); }
+  .exam-badge { background: var(--yellow); color: var(--purple); font-weight: 700; font-size: 0.78rem; padding: 4px 12px; border-radius: 20px; }
+
+  /* PROGRESS BAR */
+  .progress-bar-wrap { background: rgba(255,255,255,0.15); height: 4px; }
+  .progress-bar-fill { background: var(--yellow); height: 4px; transition: width 0.4s ease; }
+
+  /* LAYOUT */
+  .app { display: flex; min-height: calc(100vh - 80px); }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: 260px; min-width: 260px; background: var(--purple);
+    padding: 20px 0; display: flex; flex-direction: column; gap: 4px;
+    overflow-y: auto;
+  }
+  .sidebar-title { color: rgba(255,255,255,0.5); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; padding: 0 20px 8px; }
+  .mod-btn {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 20px; cursor: pointer; border: none; background: none;
+    color: rgba(255,255,255,0.7); text-align: left; width: 100%;
+    font-size: 0.85rem; transition: all 0.2s; border-left: 3px solid transparent;
+  }
+  .mod-btn:hover { background: rgba(255,255,255,0.08); color: white; }
+  .mod-btn.active { background: rgba(245,200,0,0.15); color: var(--yellow); border-left-color: var(--yellow); }
+  .mod-btn.locked { opacity: 0.4; cursor: not-allowed; }
+  .mod-btn.done { color: rgba(255,255,255,0.9); }
+  .mod-icon { font-size: 1rem; width: 20px; text-align: center; }
+  .mod-num { font-size: 0.7rem; font-weight: 700; }
+
+  /* MAIN */
+  .main { flex: 1; overflow-y: auto; padding: 32px 40px; max-width: 860px; }
+
+  /* MODULE HEADER */
+  .mod-header { margin-bottom: 28px; }
+  .mod-tag { display: inline-block; background: var(--yellow); color: var(--purple); font-weight: 700; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px; padding: 3px 10px; border-radius: 4px; margin-bottom: 8px; }
+  .mod-title { font-size: 1.6rem; font-weight: 700; color: var(--purple); }
+  .mod-subtitle { color: var(--muted); margin-top: 4px; font-size: 0.9rem; }
+
+  /* CONCEPT CARD */
+  .concept { background: white; border-radius: 12px; box-shadow: var(--shadow); margin-bottom: 20px; overflow: hidden; }
+  .concept-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 20px; cursor: pointer; user-select: none;
+    border-left: 4px solid var(--yellow);
+  }
+  .concept-header:hover { background: #fafafa; }
+  .concept-title { font-weight: 700; font-size: 1rem; }
+  .concept-toggle { color: var(--muted); font-size: 1.1rem; transition: transform 0.2s; }
+  .concept.open .concept-toggle { transform: rotate(180deg); }
+  .concept-body { display: none; padding: 0 20px 20px; }
+  .concept.open .concept-body { display: block; }
+
+  /* RASTER */
+  .raster { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+  .raster-item { border-radius: 8px; padding: 14px; }
+  .raster-item.was { background: #eff6ff; border: 1px solid #bfdbfe; }
+  .raster-item.wann { background: #f0fdf4; border: 1px solid #bbf7d0; }
+  .raster-item.nicht { background: #fff7ed; border: 1px solid #fed7aa; }
+  .raster-item.esel { background: #fdf4ff; border: 1px solid #e9d5ff; }
+  .raster-label { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; }
+  .raster-item.was .raster-label { color: #1d4ed8; }
+  .raster-item.wann .raster-label { color: #15803d; }
+  .raster-item.nicht .raster-label { color: #c2410c; }
+  .raster-item.esel .raster-label { color: #7e22ce; }
+  .raster-content { font-size: 0.87rem; line-height: 1.6; }
+
+  /* TABLE */
+  table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 0.85rem; }
+  th { background: var(--purple); color: white; padding: 8px 12px; text-align: left; }
+  td { padding: 8px 12px; border-bottom: 1px solid var(--border); }
+  tr:nth-child(even) td { background: #f9fafb; }
+
+  /* TRANSFER SECTION */
+  .transfer-section {
+    background: linear-gradient(135deg, var(--purple) 0%, #5a3fa0 100%);
+    border-radius: 12px; padding: 24px; margin-top: 32px; color: white;
+  }
+  .transfer-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--yellow); margin-bottom: 8px; }
+  .transfer-q { font-size: 1rem; line-height: 1.6; margin-bottom: 16px; }
+  .transfer-area { width: 100%; border: 2px solid rgba(255,255,255,0.2); border-radius: 8px; background: rgba(255,255,255,0.08); color: white; padding: 12px; font-size: 0.9rem; font-family: inherit; resize: vertical; min-height: 120px; }
+  .transfer-area::placeholder { color: rgba(255,255,255,0.4); }
+  .transfer-area:focus { outline: none; border-color: var(--yellow); }
+  .transfer-actions { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+  .btn { padding: 10px 20px; border: none; border-radius: 8px; font-weight: 700; font-size: 0.85rem; cursor: pointer; transition: all 0.2s; }
+  .btn-primary { background: var(--yellow); color: var(--purple); }
+  .btn-primary:hover { background: #e6b800; }
+  .btn-secondary { background: rgba(255,255,255,0.15); color: white; }
+  .btn-secondary:hover { background: rgba(255,255,255,0.25); }
+  .btn-unlock { background: var(--green); color: white; }
+  .btn-unlock:hover { background: #15803d; }
+
+  /* FEEDBACK BOX */
+  .feedback-box { margin-top: 16px; border-radius: 8px; padding: 14px; display: none; font-size: 0.87rem; line-height: 1.6; }
+  .feedback-box.show { display: block; }
+  .feedback-box.model { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); }
+  .feedback-label { font-weight: 700; color: var(--yellow); margin-bottom: 6px; }
+
+  /* FLASHCARD MODE */
+  .fc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; margin-top: 20px; }
+  .fc { perspective: 600px; height: 140px; cursor: pointer; }
+  .fc-inner { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; transition: transform 0.5s; }
+  .fc.flipped .fc-inner { transform: rotateY(180deg); }
+  .fc-front, .fc-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 10px; display: flex; align-items: center; justify-content: center; padding: 14px; text-align: center; }
+  .fc-front { background: var(--purple); color: white; font-weight: 700; font-size: 0.9rem; }
+  .fc-back { background: var(--yellow); color: var(--purple); font-weight: 600; font-size: 0.82rem; transform: rotateY(180deg); }
+
+  /* QUIZ MODE */
+  .quiz-q { font-size: 1rem; font-weight: 700; margin-bottom: 14px; }
+  .quiz-opts { display: flex; flex-direction: column; gap: 8px; }
+  .quiz-opt {
+    padding: 12px 16px; border-radius: 8px; border: 2px solid var(--border);
+    cursor: pointer; font-size: 0.88rem; transition: all 0.2s; background: white;
+    text-align: left;
+  }
+  .quiz-opt:hover { border-color: var(--purple); background: #f5f3ff; }
+  .quiz-opt.correct { border-color: var(--green); background: #f0fdf4; color: var(--green); }
+  .quiz-opt.wrong { border-color: var(--red); background: #fef2f2; color: var(--red); }
+  .quiz-result { margin-top: 12px; font-size: 0.85rem; font-weight: 600; display: none; }
+  .quiz-result.show { display: block; }
+  .quiz-result.ok { color: var(--green); }
+  .quiz-result.bad { color: var(--red); }
+  .quiz-nav { display: flex; gap: 8px; margin-top: 14px; }
+
+  /* MODE TABS */
+  .mode-tabs { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
+  .mode-tab { padding: 7px 16px; border-radius: 20px; border: 2px solid var(--border); background: white; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+  .mode-tab.active { border-color: var(--purple); background: var(--purple); color: white; }
+
+  /* OVERVIEW */
+  .overview-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+  .ov-card { background: white; border-radius: 10px; padding: 18px; box-shadow: var(--shadow); cursor: pointer; transition: transform 0.15s; border-top: 4px solid var(--yellow); }
+  .ov-card:hover { transform: translateY(-2px); }
+  .ov-card.locked-card { opacity: 0.5; cursor: not-allowed; }
+  .ov-num { font-size: 0.7rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+  .ov-name { font-weight: 700; margin: 4px 0; }
+  .ov-topics { font-size: 0.78rem; color: var(--muted); line-height: 1.5; }
+  .ov-status { margin-top: 10px; font-size: 0.75rem; font-weight: 700; }
+  .ov-status.done { color: var(--green); }
+  .ov-status.open { color: var(--purple); }
+  .ov-status.locked { color: var(--muted); }
+
+  /* UTIL */
+  .highlight { background: rgba(245,200,0,0.2); border-radius: 3px; padding: 0 3px; }
+  .tag { display: inline-block; background: #eff6ff; color: #1d4ed8; border-radius: 4px; padding: 2px 8px; font-size: 0.75rem; font-weight: 600; margin: 2px; }
+  .divider { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+  .info-box { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 12px 16px; margin: 12px 0; font-size: 0.85rem; line-height: 1.6; }
+  .warn-box { background: #fff7ed; border: 1px solid #fed7aa; border-radius: 8px; padding: 12px 16px; margin: 12px 0; font-size: 0.85rem; line-height: 1.6; }
+  .fc-hint { font-size: 0.75rem; color: var(--muted); text-align: center; margin-top: 8px; }
+  strong { font-weight: 700; }
+  ul { padding-left: 18px; }
+  li { margin-bottom: 4px; }
+  p { margin-bottom: 8px; }
+
+  @media (max-width: 700px) {
+    .sidebar { display: none; }
+    .main { padding: 20px 16px; }
+    .raster { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">DAN <span>Lernplattform</span></div>
+    <div class="exam-badge">Prüfung: Mo 29.06.2026</div>
+  </div>
+  <div class="progress-bar-wrap">
+    <div class="progress-bar-fill" id="progressBar" style="width:0%"></div>
+  </div>
+</header>
+
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+  <main class="main" id="mainContent"></main>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════════════
+
+const MODULES = [
+  {
+    id: 0,
+    title: "Übersicht",
+    icon: "🗺️",
+    type: "overview"
+  },
+  {
+    id: 1,
+    title: "Grundlagen",
+    icon: "🏗️",
+    subtitle: "Wissenstreppe · Datenkategorien · Dirty Data · 5 C's · Ethik",
+    concepts: [
+      {
+        title: "Wissenstreppe nach North",
+        items: {
+          was: `<strong>Wissenstreppe</strong> = stufenweises Modell, wie aus Rohdaten Handlungskompetenz wird.<br><br>
+          <table><tr><th>Stufe</th><th>Zuwachs durch</th></tr>
+          <tr><td>Symbole</td><td>—</td></tr>
+          <tr><td>Daten</td><td>+ Syntax (Struktur)</td></tr>
+          <tr><td>Information</td><td>+ Bedeutung/Kontext</td></tr>
+          <tr><td>Wissen</td><td>+ Vernetzung</td></tr>
+          <tr><td>Handeln</td><td>+ Motivation/Anwendung</td></tr>
+          <tr><td>Kompetenz</td><td>+ Erfahrung</td></tr>
+          <tr><td>Expertise</td><td>+ Jahre/Tiefe</td></tr>
+          </table>`,
+          wann: `Immer wenn erklärt werden soll, WARUM Datenbereinigung wichtig ist. Rohdaten ≠ Wissen. Ohne saubere Daten blockiert man den Aufstieg auf der Treppe bereits auf der untersten Stufe.`,
+          nicht: `Nicht anwenden auf qualitative Forschung ohne Kontextualisierung. Die Treppe ist kein technisches, sondern ein konzeptuelles Modell — nicht auf Code-Ebene direkt abbildbar.`,
+          esel: `<strong>"Sei Daten-Info-Wis-Han-Kom-Ex"</strong> — Symbole, Daten, Information, Wissen, Handeln, Kompetenz, Expertise. Stell dir eine Treppe vor, du trägst einen Datensack und wirst bei jeder Stufe klüger.`
+        }
+      },
+      {
+        title: "Skalenniveaus (4 Stufen)",
+        items: {
+          was: `Skalenniveaus beschreiben, WAS mathematisch mit Variablen erlaubt ist:<br><br>
+          <table><tr><th>Skala</th><th>Eigenschaft</th><th>Beispiel</th><th>Erlaubt</th></tr>
+          <tr><td><strong>Nominal</strong></td><td>nur Kategorien</td><td>Geschlecht, Farbe</td><td>=, ≠</td></tr>
+          <tr><td><strong>Ordinal</strong></td><td>+ Reihenfolge</td><td>Schulnoten, Likert</td><td>&lt;, &gt;</td></tr>
+          <tr><td><strong>Intervall</strong></td><td>+ gleiche Abstände</td><td>Temperatur °C</td><td>+, −</td></tr>
+          <tr><td><strong>Verhältnis</strong></td><td>+ echter Nullpunkt</td><td>Gewicht, Alter</td><td>×, ÷</td></tr>
+          </table>`,
+          wann: `Vor jeder Analyse: bestimmt, welche Statistik erlaubt ist (Mittelwert nur ab Intervall!), welche Imputationsmethode passt, welche Visualisierung sinnvoll ist.`,
+          nicht: `Nicht Mittelwert bei Nominaldaten bilden ("Durchschnittsgeschlecht" sinnlos). Nicht Ordinalabstände als gleich annehmen (Note 1→2 ≠ 2→3 unbedingt).`,
+          esel: `<strong>N-O-I-V: "Nicht Ohne Ihre Vagheit"</strong> — Nominal, Ordinal, Intervall, Verhältnis. Jede Stufe darf alles der vorigen PLUS eine Sache mehr.`
+        }
+      },
+      {
+        title: "8 Typen Dirty Data",
+        items: {
+          was: `Dirty Data = Daten mit Qualitätsproblemen, die Analysen verfälschen.<br><br>
+          <table><tr><th>Typ</th><th>Problem</th><th>Beispiel</th></tr>
+          <tr><td><strong>Duplicate</strong></td><td>doppelte Einträge</td><td>Kunde 2× angelegt</td></tr>
+          <tr><td><strong>Incorrect</strong></td><td>falsche Werte/Tippfehler</td><td>Geburtsjahr 1899</td></tr>
+          <tr><td><strong>Inconsistent</strong></td><td>verschiedene Formate</td><td>DD.MM.YYYY vs YYYY-MM-DD</td></tr>
+          <tr><td><strong>Incomplete</strong></td><td>fehlende Felder</td><td>E-Mail leer</td></tr>
+          <tr><td><strong>Inaccurate</strong></td><td>unklare Präzision</td><td>"ca. 100 km"</td></tr>
+          <tr><td><strong>Outdated</strong></td><td>veraltete Daten</td><td>alte Adresse</td></tr>
+          <tr><td><strong>Insecure</strong></td><td>fehlendes Zugriffsmanagement</td><td>Passwort im Klartext</td></tr>
+          <tr><td><strong>Hoarded</strong></td><td>sinnlos gesammelt</td><td>Daten ohne Verwendungszweck</td></tr>
+          </table>`,
+          wann: `Bei Datenprüfung vor jeder Analyse. Auch bei Prüfungsfragen zu "Was kann mit Daten schiefgehen?"`,
+          nicht: `Nicht als erschöpfende Liste sehen — in der Praxis überlappen sich Typen (ein veralteter Wert ist oft auch inaccurate).`,
+          esel: `<strong>DI-CO-IN-IN-IN-OU-IN-HO</strong> = <strong>"Dirty Cows Invent Incredible Inaccurate Outdated Insecure Hoards"</strong>`
+        }
+      },
+      {
+        title: "5 C's of Data Quality",
+        items: {
+          was: `Framework zur Bewertung von Datenqualität:<br><br>
+          <table><tr><th>C</th><th>Bedeutung</th><th>Verletzt wenn...</th></tr>
+          <tr><td><strong>Clean</strong></td><td>keine fehlenden/falschen Werte</td><td>Tippfehler, NaN</td></tr>
+          <tr><td><strong>Consistent</strong></td><td>gleiche Bedeutung überall</td><td>unterschiedl. Formate</td></tr>
+          <tr><td><strong>Conformed</strong></td><td>klare Einheiten & Grenzen</td><td>km vs. Meilen</td></tr>
+          <tr><td><strong>Current</strong></td><td>zeitgemäß</td><td>veraltete Adressen</td></tr>
+          <tr><td><strong>Complete</strong></td><td>Breite & Tiefe vorhanden</td><td>fehlende Spalten</td></tr>
+          </table>`,
+          wann: `Als Checkliste nach der Datenerhebung, beim Reporting über Datenqualität, in der Prüfung zur Bewertung von Datensätzen.`,
+          nicht: `Nicht mit den 5 C's der Ethik verwechseln! (andere Domäne, gleiche Anzahl Cs)`,
+          esel: `<strong>Pizza-Test:</strong> Gute Pizza muss SAUBER (Clean) sein, überall GLEICH (Consistent) schmecken, in GENORMTER Größe (Conformed) kommen, FRISCH (Current) sein und VOLLSTÄNDIG (Complete) belegt sein.`
+        }
+      },
+      {
+        title: "Ethische Datennutzung (5 C's Ethik)",
+        items: {
+          was: `5 ethische Prinzipien für Datennutzung:<br><br>
+          <ul>
+          <li><strong>Consent</strong> — Einwilligung der Betroffenen</li>
+          <li><strong>Clarity</strong> — klare Kommunikation über Datennutzung</li>
+          <li><strong>Consistency</strong> — konsistente Anwendung der Regeln</li>
+          <li><strong>Control & Transparency</strong> — Betroffene haben Kontrolle</li>
+          <li><strong>Consequences & Harm</strong> — Schaden aktiv vermeiden</li>
+          </ul>`,
+          wann: `Bei jedem Datenprojekt mit personenbezogenen Daten. DSGVO-Konformität, Forschungsethik, KI-Anwendungen.`,
+          nicht: `Nicht nur als rechtliches Thema sehen — auch bei öffentlichen Daten gelten ethische Überlegungen (Aggregierungsrisiko, Re-Identifikation).`,
+          esel: `<strong>Consent Clarity Consistency Control Consequences</strong> — "Kann ich das mit den Daten machen, ohne jemandem zu schaden?" → 5 C-Probe.`
+        }
+      },
+      {
+        title: "Data Life Cycle (Mahanti 2019)",
+        items: {
+          was: `Lebenszyklus von Daten in 6 Phasen:<br><br>
+          <strong>Creation → Processing → Storage → Access → Archive → Purge</strong><br><br>
+          Jede Phase kann Qualitätsprobleme einführen!`,
+          wann: `Wenn erklärt werden soll, WANN Dirty Data entsteht und WO im Prozess bereinigt werden muss.`,
+          nicht: `Nicht als starres Modell sehen — in der Praxis iterieren Phasen, Daten können reaktiviert werden.`,
+          esel: `<strong>Crazy Parrots Sleep And Party</strong> = Creation, Processing, Storage, Access, (Archive), Purge. Oder: Daten werden geboren, verarbeitet, schlafen, jemand greift zu, schlafen weiter, sterben.`
+        }
+      }
+    ],
+    flashcards: [
+      { q: "Was ist der Unterschied zwischen Daten und Information?", a: "Daten = Symbole + Syntax (keine Bedeutung). Information = Daten + Kontext/Bedeutung." },
+      { q: "Nenne die 8 Typen Dirty Data.", a: "Duplicate, Incorrect, Inconsistent, Incomplete, Inaccurate, Outdated, Insecure, Hoarded" },
+      { q: "Was bedeutet 'Conformed' bei den 5 C's?", a: "Klare, einheitliche Einheiten und Grenzen — z.B. alle Distanzen in km, nicht km und Meilen gemischt." },
+      { q: "Welches Skalenniveau erlaubt Division?", a: "Verhältnisskala — hat echten Nullpunkt (z.B. Gewicht: 60 kg ist doppelt so schwer wie 30 kg)." },
+      { q: "Was ist der Unterschied zwischen Intervall- und Verhältnisskala?", a: "Intervall: kein echter Nullpunkt (0°C = nicht 'keine Wärme'). Verhältnis: echter Nullpunkt (0 kg = kein Gewicht)." },
+      { q: "Was bedeutet MNAR bei Missing Values?", a: "Missing Not At Random — der Grund fürs Fehlen hängt vom Wert selbst ab (z.B. Einkommensfrage: Reiche antworten nicht)." },
+      { q: "Welche Phase kommt nach 'Processing' im Data Life Cycle?", a: "Storage" },
+      { q: "'Hoarded Data' — was ist das Problem?", a: "Daten werden gesammelt ohne klaren Verwendungszweck ('just in case'). Erhöht Speicher, Compliance-Risiko, und Rauschen in Analysen." }
+    ],
+    quiz: [
+      { q: "Eine Kundendatenbank enthält Geburtsdaten als '01.01.1990' und '1990-01-01'. Welcher Dirty-Data-Typ liegt vor?", opts: ["Incorrect", "Inconsistent", "Duplicate", "Outdated"], correct: 1 },
+      { q: "Temperatur in °C ist welches Skalenniveau?", opts: ["Nominal", "Ordinal", "Intervall", "Verhältnis"], correct: 2 },
+      { q: "Welches der 5 C's (Qualität) bezieht sich darauf, dass Daten zeitgemäß sein müssen?", opts: ["Clean", "Consistent", "Current", "Complete"], correct: 2 },
+      { q: "Auf welcher Stufe der Wissenstreppe entsteht Wissen?", opts: ["Durch Hinzufügen von Syntax", "Durch Vernetzung von Information", "Durch Motivation zum Handeln", "Durch jahrelange Erfahrung"], correct: 1 },
+      { q: "Was ist das ethische C für 'Einwilligung der Betroffenen'?", opts: ["Clarity", "Consistency", "Consent", "Control"], correct: 2 }
+    ],
+    transfer: {
+      q: `Du bist Data Analyst bei einem E-Commerce-Unternehmen. Dein Datensatz enthält Kundendaten aus 5 Systemen, zusammengeführt über 3 Jahre. Du findest: manche Kunden sind dreifach angelegt, Geburtsdaten mal als DD.MM.YYYY mal als YYYY-MM-DD, und 12% der E-Mail-Felder sind leer.\n\n▶ Welche Typen von Dirty Data liegen vor?\n▶ Welche der 5 C's sind verletzt?\n▶ Warum solltest du NICHT einfach alle Zeilen mit fehlenden Werten löschen?`,
+      model: `<strong>Dirty-Data-Typen:</strong> Duplicate (dreifach angelegt), Inconsistent (Datumsformate), Incomplete (E-Mail leer).<br><br>
+      <strong>5 C's verletzt:</strong> Clean (fehlende E-Mails, Duplikate), Consistent (unterschiedl. Datumsformate), Complete (fehlende Felder).<br><br>
+      <strong>Warum nicht einfach löschen?</strong> 12% fehlendes E-Mail-Feld bedeutet nicht, dass die ganze Zeile wertlos ist. Alle anderen Felder könnten valid sein. Listwise Deletion → Informationsverlust, mögliche Verzerrung (MNAR: vielleicht fehlen E-Mails systematisch bei einer Kundengruppe). Besser: Imputation oder paarweises Löschen je nach Analyse.`
+    }
+  },
+  {
+    id: 2,
+    title: "Textdaten Grundlagen",
+    icon: "📝",
+    subtitle: "Sprache · Korpus · Textualitätskriterien · langue/parole · Medium/Modus",
+    concepts: [
+      {
+        title: "Sprache als Datenobjekt: langue vs. parole",
+        items: {
+          was: `<strong>de Saussure (1916):</strong> Sprache hat zwei Seiten:<br><br>
+          <ul>
+          <li><strong>Langue</strong> = abstraktes Sprachsystem, Regeln, Grammatik (das "Regelwerk")</li>
+          <li><strong>Parole</strong> = konkreter Sprachgebrauch, einzelne Äußerungen (die "Instanz")</li>
+          </ul><br>
+          <strong>Chomsky (1965):</strong> analoge Unterscheidung:<br>
+          <ul>
+          <li><strong>Kompetenz</strong> = angeborenes/erworbenes Sprachvermögen</li>
+          <li><strong>Performanz</strong> = tatsächliche Sprachproduktion (mit Fehlern, Unterbrechungen)</li>
+          </ul><br>
+          <strong>Koch & Oesterreicher:</strong><br>
+          <ul>
+          <li><strong>Medium</strong> = phonisch (gesprochen) vs. graphisch (geschrieben) → physisch</li>
+          <li><strong>Modus</strong> = konzeptionell gesprochen vs. konzeptionell geschrieben → Nähe/Distanz</li>
+          </ul>`,
+          wann: `Wenn erklärt werden soll, WARUM geschriebene Texte (Korpora) nicht dasselbe sind wie gesprochene Sprache. Relevant für: Korpusdesign, NLP-Modellauswahl, Bewertung von Trainingsdaten.`,
+          nicht: `Nicht langue mit "Textkollektionen" verwechseln. Langue ist abstrakt (nicht direkt beobachtbar), parole ist der beobachtbare Text.`,
+          esel: `<strong>Langue = Landkarte</strong> (abstrakt, zeigt alle möglichen Wege). <strong>Parole = Reise</strong> (konkrete Instanz, eine von vielen möglichen). Chomsky: <strong>Kompetenz = Können, Performanz = Tun.</strong>`
+        }
+      },
+      {
+        title: "Korpus-Hierarchie",
+        items: {
+          was: `<strong>Hierarchische Struktur von Textkorpora:</strong><br><br>
+          <strong>Korpus</strong> → Sammlung von Dokumenten (strukturiert, repräsentativ)<br>
+          → <strong>Dokument</strong> → einzelner Text<br>
+          → → <strong>Abschnitt</strong> → Paragraph<br>
+          → → → <strong>Satz</strong> → grammatikalische Einheit<br>
+          → → → → <strong>Wortform</strong> → Oberflächenform<br>
+          → → → → → <strong>Token</strong> → kleinstes Verarbeitungselement`,
+          wann: `Bei der Planung von NLP-Pipelines: auf welcher Ebene tokenisiert man? Auf welcher Ebene analysiert man? (Satzebene für Sentiment, Dokumentebene für Topic Modeling)`,
+          nicht: `Token ≠ Wort! Token können Subwörter, Satzzeichen, Zahlen sein. "können't" = 2 Tokens.`,
+          esel: `<strong>Kuchen-Analogie:</strong> Korpus = Bäckerei, Dokument = Kuchen, Abschnitt = Schicht, Satz = Scheibe, Wortform = Krümel, Token = Atom.`
+        }
+      },
+      {
+        title: "Type vs. Token",
+        items: {
+          was: `<strong>Token</strong> = konkrete Instanz eines Wortes im Text<br>
+          <strong>Type</strong> = eindeutige Wortform (Vokabular)<br><br>
+          Beispiel: "der Mann sah den Mann"<br>
+          → 5 Tokens, 4 Types (Mann erscheint 2× → 1 Type)<br><br>
+          <strong>Type-Token-Ratio (TTR)</strong> = Types / Tokens → Maß für Vokabularreichtum`,
+          wann: `Bei Korpusstatistiken, Vokabularbeschreibung, Bewertung von Sprachmodellen (je höher TTR, desto vielfältiger).`,
+          nicht: `TTR nicht über verschiedene Textlängen vergleichen — längere Texte haben zwangsläufig niedrigere TTR (Wörter wiederholen sich).`,
+          esel: `<strong>Type = Gattung/Art</strong> (Hund als Konzept), <strong>Token = Individuum</strong> (dieser eine Hund jetzt). Im Text: zähle Tokens = alle Wörter, zähle Types = verschiedene Wörter.`
+        }
+      },
+      {
+        title: "7 Textualitätskriterien (Beaugrande/Dressler 1981)",
+        items: {
+          was: `Was macht einen Text zu einem Text? 7 Kriterien:<br><br>
+          <table><tr><th>Kriterium</th><th>Bedeutung</th><th>Beispiel-Verletzung</th></tr>
+          <tr><td><strong>Kohäsion</strong></td><td>grammatische Verknüpfung (oberflächlich)</td><td>keine Pronomen-Bezüge</td></tr>
+          <tr><td><strong>Kohärenz</strong></td><td>inhaltlicher Zusammenhang (tief)</td><td>zufällig aneinandergereihte Sätze</td></tr>
+          <tr><td><strong>Intentionalität</strong></td><td>Absicht des Senders</td><td>—</td></tr>
+          <tr><td><strong>Akzeptabilität</strong></td><td>Erwartung des Empfängers</td><td>—</td></tr>
+          <tr><td><strong>Informativität</strong></td><td>Neuheitswert</td><td>100% bekannte Info</td></tr>
+          <tr><td><strong>Situationalität</strong></td><td>Einbettung in Kommunikationssituation</td><td>—</td></tr>
+          <tr><td><strong>Intertextualität</strong></td><td>Bezug auf andere Texte</td><td>—</td></tr>
+          </table>`,
+          wann: `Wenn erklärt werden soll, warum NLP schwierig ist: Kohärenz erkennen erfordert Weltwissen, das Modelle nicht immer haben.`,
+          nicht: `Nicht alle 7 müssen in jedem Text explizit analysiert werden. Kohäsion + Kohärenz sind die prüfungsrelevantesten.`,
+          esel: `<strong>K-K-I-A-I-S-I</strong> → "Kein Kleines Idyll Akzeptiert Informationsarmut Situationslos Isoliert" — oder: KoKo (Kohäsion, Kohärenz) sind die wichtigsten!`
+        }
+      }
+    ],
+    flashcards: [
+      { q: "Was ist der Unterschied zwischen langue und parole?", a: "Langue = abstraktes Sprachsystem/Regelwerk. Parole = konkreter Sprachgebrauch/einzelne Äußerung." },
+      { q: "Was unterscheidet Type von Token?", a: "Token = jede einzelne Wortinstanz im Text. Type = eindeutige Wortform. 'der Mann sah den Mann' = 5 Tokens, 4 Types." },
+      { q: "Was bedeutet Kohäsion vs. Kohärenz?", a: "Kohäsion = grammatisch-formale Verknüpfung (Pronomen, Konjunktionen). Kohärenz = inhaltlicher Zusammenhang/Sinnhaftigkeit." },
+      { q: "Was ist Intertextualität?", a: "Bezug eines Textes auf andere Texte (Zitate, Anspielungen, Gattungskonventionen)." },
+      { q: "Koch & Oesterreicher: Was ist der Unterschied zwischen Medium und Modus?", a: "Medium = physische Realisierung (phonisch/graphisch). Modus = konzeptionell (Nähe/Distanz der Sprache), unabhängig vom Medium." },
+      { q: "Was ist die Type-Token-Ratio (TTR)?", a: "TTR = Anzahl Types / Anzahl Tokens. Misst Vokabularreichtum. Höher = vielfältiger Text." }
+    ],
+    quiz: [
+      { q: "Welches Textualitätskriterium beschreibt die grammatische Oberflächenverknüpfung?", opts: ["Kohärenz", "Kohäsion", "Intentionalität", "Intertextualität"], correct: 1 },
+      { q: "Im Satz 'Die Katze sieht die Katze' — wie viele Tokens und Types gibt es?", opts: ["4 Tokens, 3 Types", "5 Tokens, 4 Types", "4 Tokens, 4 Types", "5 Tokens, 3 Types"], correct: 0 },
+      { q: "Was entspricht 'parole' bei Chomsky?", opts: ["Kompetenz", "Performanz", "Langue", "Medium"], correct: 1 },
+      { q: "Was ist das kleinste Element in der Korpus-Hierarchie?", opts: ["Wortform", "Satz", "Token", "Morphem"], correct: 2 }
+    ],
+    transfer: {
+      q: `Du analysierst einen Datensatz aus Social-Media-Posts. Dein Kollege sagt: "Wir tokenisieren einfach nach Leerzeichen, das reicht." \n\n▶ Erkläre anhand der Korpus-Hierarchie, was dabei verloren gehen kann.\n▶ Warum ist die Unterscheidung zwischen Kohäsion und Kohärenz für NLP-Modelle relevant?\n▶ Welches Konzept (Type/Token oder langue/parole) beschreibt besser, was ein Vokabular eines Sprachmodells ist?`,
+      model: `<strong>Tokenisierung nach Leerzeichen:</strong> verliert Satzzeichen als separate Tokens ("Hallo!" → "Hallo!" statt ["Hallo", "!"]), Hashtags, URLs, Emoticons werden falsch behandelt. Subwort-Informationen gehen verloren. Bei Texten mit Sonderzeichen (Social Media!) besonders problematisch.<br><br>
+      <strong>Kohäsion vs. Kohärenz für NLP:</strong> Kohäsion (Pronomen, Konnektoren) ist formell nachvollziehbar → einfacher für Modelle. Kohärenz (inhaltlicher Sinn) braucht Weltwissen → schwieriger. Transformer-Modelle lernen implizit Kohärenz, klassische Modelle scheitern daran oft.<br><br>
+      <strong>Vokabular = Types:</strong> Das Vokabular eines Sprachmodells = eindeutige Wortformen (Types), nicht jede Vorkommensinstanz. Kommt aus der langue-Idee: das abstrakte Inventar, nicht die konkreten Instanzen.`
+    }
+  },
+  {
+    id: 3,
+    title: "Tokenisierung & Normalisierung",
+    icon: "✂️",
+    subtitle: "Stemming · Lemmatisierung · Linguistische Einheiten · Semiotik",
+    concepts: [
+      {
+        title: "Stemming vs. Lemmatisierung",
+        items: {
+          was: `Beide reduzieren Wortformen auf eine Grundform — aber unterschiedlich:<br><br>
+          <table><tr><th></th><th>Stemming</th><th>Lemmatisierung</th></tr>
+          <tr><td><strong>Was?</strong></td><td>Schneidet Endung ab (regelbasiert)</td><td>Gibt Wörterbuch-Grundform zurück</td></tr>
+          <tr><td><strong>Output</strong></td><td>oft kein echtes Wort ("spielend" → "spiel")</td><td>echtes Wort ("spielte" → "spielen")</td></tr>
+          <tr><td><strong>Berücksichtigt</strong></td><td>Regeln, keine Wortart</td><td>Wortart + Kontext</td></tr>
+          <tr><td><strong>Beispiele</strong></td><td>Porter-, Snowball-Stemmer</td><td>spaCy, NLTK WordNet</td></tr>
+          <tr><td><strong>Fehler</strong></td><td>Overstemming, Understemming</td><td>selten, braucht Modell</td></tr>
+          </table><br>
+          <strong>Overstemming:</strong> zu viel abgeschnitten → verschiedene Wörter bekommen gleichen Stamm<br>
+          <strong>Understemming:</strong> zu wenig abgeschnitten → gleiche Wörter behalten verschiedene Formen`,
+          wann: `Stemming: schnelle, ressourcenarme Vorverarbeitung, Topic Modeling. Lemmatisierung: wenn Wortart wichtig ist (Sentiment, Named Entity Recognition).`,
+          nicht: `Stemming NICHT bei Sentiment-Analyse (Negationen können verändert werden). Lemmatisierung NICHT wenn Sprachmodell kein deutsches Modell hat.`,
+          esel: `<strong>Stem = Hackebeil</strong> (grob, schnell). <strong>Lemma = Skalpell</strong> (präzise, aber teurer). Overstemming: "Bank" und "Bank" werden gleich → Problem!`
+        }
+      },
+      {
+        title: "Linguistische Einheiten: Phon/Phonem, Graph/Graphem, Morph/Morphem",
+        items: {
+          was: `Abstrakt/Konkret-Paare in der Linguistik:<br><br>
+          <table><tr><th>Konkret (Instanz)</th><th>Abstrakt (Kategorie)</th><th>Ebene</th></tr>
+          <tr><td><strong>Phon</strong></td><td><strong>Phonem</strong></td><td>Laut/Schall</td></tr>
+          <tr><td><strong>Graph</strong></td><td><strong>Graphem</strong></td><td>Schriftzeichen</td></tr>
+          <tr><td><strong>Morph</strong></td><td><strong>Morphem</strong></td><td>kleinste bedeutungstragende Einheit</td></tr>
+          </table><br>
+          Phoneme = bedeutungsunterscheidende Lautkategorien (Englisch: /p/ vs /b/)<br>
+          Grapheme = bedeutungsunterscheidende Schriftzeichen<br>
+          Morpheme = kleinste Einheit mit eigener Bedeutung ("un-glück-lich" = 3 Morpheme)`,
+          wann: `Bei der Erklärung von Tokenisierungsebenen (Zeichen-, Subwort-, Wort-, Satzebene). Morphem-Ebene = Basis für Stemming.`,
+          nicht: `Phon ≠ Phonem (Phon = akustisches Ereignis, Phonem = abstrakte Kategorie). Gleiches für Graph/Graphem.`,
+          esel: `<strong>-em Suffix = abstrakt/kategorisch</strong> (Phonem, Graphem, Morphem). Ohne -em = konkret (Phon, Graph, Morph). Wie "Art" vs. "Individuum".`
+        }
+      },
+      {
+        title: "Semiotik: de Saussure & Peirce",
+        items: {
+          was: `<strong>de Saussure (dyadisch):</strong><br>
+          Zeichen = Signifikant (Lautbild/Form) + Signifikat (Vorstellung/Inhalt)<br>
+          Beziehung: arbiträr (willkürlich), konventionell<br><br>
+          <strong>Peirce (triadisch):</strong><br>
+          Zeichen = Repräsentamen + Objekt + Interpretant<br>
+          (das Zeichen + das Bezeichnete + die erzeugte Bedeutung im Kopf)<br><br>
+          <strong>Peirce Zeichentypen:</strong><br>
+          <ul>
+          <li><strong>Ikon</strong> = Ähnlichkeitsbeziehung (Foto, Karte)</li>
+          <li><strong>Index</strong> = kausale/existenzielle Beziehung (Rauch → Feuer, Fieberthermometer)</li>
+          <li><strong>Symbol</strong> = arbiträre Konvention (Wörter, Verkehrszeichen)</li>
+          </ul>`,
+          wann: `Erklärung, warum Wörter bedeuten was sie bedeuten (arbiträr!), warum NLP mit Symbolen kämpft, warum Emojis ikonisch sind.`,
+          nicht: `Nicht Symbol im Alltagssinn (Sinnbild) mit Peirce's Symbol (arbiträres Zeichen) verwechseln.`,
+          esel: `<strong>ISI: Ikon-Symbol-Index</strong> → "Ich Sehe Index": Ikon sieht aus wie, Index zeigt auf, Symbol ist vereinbart. Rauch-Feuer = Index (Ursache-Wirkung). Karte = Ikon. "Feuer"-Wort = Symbol.`
+        }
+      },
+      {
+        title: "Text-Preprocessing Pipeline",
+        items: {
+          was: `Standardschritte zur Textbereinigung:<br><br>
+          <ol>
+          <li>Text <strong>laden</strong> und Struktur erkennen (Metadaten vs. Text)</li>
+          <li><strong>Extraktion</strong> relevanter Textteile (split nach Delimiter)</li>
+          <li><strong>Kleinschreibung</strong> (lower())</li>
+          <li><strong>Zeilenumbrüche entfernen</strong> (splitlines + join)</li>
+          <li><strong>Satzzeichen entfernen</strong> (str.maketrans + translate)</li>
+          <li><strong>Emojis/Sonderzeichen</strong> entfernen (isalpha/isdigit)</li>
+          <li><strong>Mehrfachleerzeichen</strong> reduzieren (' '.join(text.split()))</li>
+          <li><strong>Tokenisierung</strong></li>
+          <li><strong>Stoppwörter entfernen</strong></li>
+          <li><strong>Stemming oder Lemmatisierung</strong></li>
+          </ol>`,
+          wann: `Vor jeder NLP-Analyse: Topic Modeling, Sentiment, Klassifikation. Welche Schritte wegzulassen hängt vom Task ab (Sentiment: Negationen NICHT entfernen!).`,
+          nicht: `Nicht alle Schritte blind anwenden. Stoppwort-Entfernung schadet bei Sentiment. Satzzeichen-Entfernung schadet bei Satztokenisierung.`,
+          esel: `<strong>LExKLSEMoStLe</strong>: Laden, Extrahieren, Kleinschreiben, Lower, Splitlines, Entfernen, Mojiclean, Stoppwörter, Lemmatisieren. Oder merke: "Erst putzen, dann zerlegen, dann verfeinern."`
+        }
+      }
+    ],
+    flashcards: [
+      { q: "Was ist Overstemming?", a: "Zu viel abgeschnitten → verschiedene Wörter bekommen denselben Stamm. Z.B. 'Bank' (Geldinstitut) und 'Bänke' bekommen denselben Stamm." },
+      { q: "Was unterscheidet Phon von Phonem?", a: "Phon = konkrete Lautinstanz. Phonem = abstrakte Lautkategorie, die Bedeutung unterscheidet." },
+      { q: "Peirce: Was ist ein Index?", a: "Zeichen mit kausaler/existenzieller Beziehung zum Bezeichneten. Rauch = Index für Feuer. Fieber = Index für Krankheit." },
+      { q: "Warum scheitert Tokenisierung nach Leerzeichen bei 'nicht's'?", a: "Kontraktion = ein Token nach Leerzeichen, aber semantisch zwei Wörter ('nicht' + 'es'). Leerzeichen-Split erkennt keine internen Grenzen." },
+      { q: "Was ist der Vorteil von Lemmatisierung gegenüber Stemming?", a: "Lemmatisierung berücksichtigt Wortart und Kontext → Output ist immer ein echtes Wort. Stemming kann zu nicht-existierenden Formen führen." },
+      { q: "Welche Tokenisierungs-Ebenen gibt es?", a: "Zeichenebene, Subwort-Ebene, Wortebene, Satzebene" }
+    ],
+    quiz: [
+      { q: "Stemming wendet an: 'spielend' → 'spiel'. Welcher Fehlertyp entsteht wenn auch 'Spielzeug' → 'spiel' wird?", opts: ["Understemming", "Overstemming", "Lemma-Fehler", "Tokenisierungsfehler"], correct: 1 },
+      { q: "Ein Foto einer Person ist welcher Peirce-Zeichentyp?", opts: ["Symbol", "Index", "Ikon", "Signifikat"], correct: 2 },
+      { q: "Was ist 'un-glück-lich' auf morphemischer Ebene?", opts: ["1 Morphem", "2 Morpheme", "3 Morpheme", "4 Morpheme"], correct: 2 },
+      { q: "Welcher Python-Befehl entfernt führende und abschließende Leerzeichen?", opts: ["strip()", "split()", "join()", "translate()"], correct: 0 }
+    ],
+    transfer: {
+      q: `Du bekommst einen rohen Reklamationstext:\n"Guten Tag***, mein Paket ist leider noch nich angekommen 😕. Tracking hängt seit 5 Tagen ==> auf 'im Verteilzentrum'. #fail @ShopSupport"\n\n▶ Nenne 5 konkrete Bereinigungsschritte in richtiger Reihenfolge.\n▶ Entscheide: Stemming oder Lemmatisierung — und begründe für diesen Use-Case (Topic Modeling der Reklamationen).\n▶ Was ist "😕" semiotisch gesehen (Peirce)?`,
+      model: `<strong>Bereinigungsschritte:</strong><br>
+      1. @Mentions entfernen (re.sub r'@\\w+', '', text)<br>
+      2. #Hashtags entfernen (re.sub r'#\\w+', '', text)<br>
+      3. URLs entfernen (re.sub r'https?://\\S+', '', text)<br>
+      4. Sonderzeichen entfernen (***,==>, Emojis)<br>
+      5. Mehrfachleerzeichen reduzieren (' '.join(text.split()))<br><br>
+      <strong>Stemming für Topic Modeling:</strong> ✓ — Topic Modeling braucht nur thematische Ähnlichkeit, nicht morphologische Präzision. Stemming ist schneller, reicht aus. Lemmatisierung wäre besser für Sentiment oder wenn Wortbedeutung wichtig ist.<br><br>
+      <strong>😕 ist ein Ikon</strong> (Peirce): es sieht aus wie ein trauriges Gesicht → Ähnlichkeitsbeziehung zum Konzept "Enttäuschung/Traurigkeit". Kein arbiträres Symbol.`
+    }
+  },
+  {
+    id: 4,
+    title: "Regular Expressions",
+    icon: "🔍",
+    subtitle: "Syntax · Flags · re-Funktionen · Anwendung",
+    concepts: [
+      {
+        title: "Regex: Grundsyntax",
+        items: {
+          was: `<strong>Regular Expressions</strong> = Muster zur Suche/Ersetzung in Strings.<br><br>
+          <table><tr><th>Muster</th><th>Bedeutung</th><th>Beispiel</th></tr>
+          <tr><td><code>.</code></td><td>beliebiges Zeichen (außer \\n)</td><td><code>a.c</code> matcht "abc"</td></tr>
+          <tr><td><code>*</code></td><td>0 oder mehr</td><td><code>a*</code> matcht "", "a", "aaa"</td></tr>
+          <tr><td><code>+</code></td><td>1 oder mehr</td><td><code>a+</code> matcht "a", "aaa"</td></tr>
+          <tr><td><code>?</code></td><td>0 oder 1</td><td><code>a?</code> matcht "", "a"</td></tr>
+          <tr><td><code>^</code></td><td>Anfang</td><td><code>^Hallo</code></td></tr>
+          <tr><td><code>$</code></td><td>Ende</td><td><code>Tschüss$</code></td></tr>
+          <tr><td><code>\\d</code></td><td>Ziffer</td><td><code>\\d+</code> = Zahlen</td></tr>
+          <tr><td><code>\\w</code></td><td>Wortzeichen (a-z,A-Z,0-9,_)</td><td><code>\\w+</code> = Wörter</td></tr>
+          <tr><td><code>\\s</code></td><td>Whitespace</td><td><code>\\s+</code> = Leerzeichen</td></tr>
+          <tr><td><code>[abc]</code></td><td>Zeichenklasse</td><td><code>[aeiou]</code> = Vokale</td></tr>
+          <tr><td><code>(ab)</code></td><td>Gruppe</td><td>für Erfassen/Referenzieren</td></tr>
+          </table>`,
+          wann: `Text-Bereinigung, Muster extrahieren (URLs, @Mentions, Emails), Validierung, Log-Parsing.`,
+          nicht: `Nicht für HTML-Parsing (besser: BeautifulSoup). Nicht für sehr komplexe Strukturen (besser: Parser). Raw-Strings r"..." verwenden um Backslash-Konflikte zu vermeiden.`,
+          esel: `<strong>".* +"</strong> → Punkt = irgendwas, Stern = beliebig oft, Plus = mindestens einmal. Merke: <strong>Punkt-Stern = alles</strong>, <strong>\\d = digit, \\w = word, \\s = space</strong>`
+        }
+      },
+      {
+        title: "re-Modul: Funktionen & Flags",
+        items: {
+          was: `<strong>Wichtige Funktionen:</strong><br>
+          <table><tr><th>Funktion</th><th>Zweck</th></tr>
+          <tr><td><code>re.search(A, B)</code></td><td>erstes Match in B</td></tr>
+          <tr><td><code>re.match(A, B)</code></td><td>Match nur am Anfang</td></tr>
+          <tr><td><code>re.findall(A, B)</code></td><td>alle Matches als Liste</td></tr>
+          <tr><td><code>re.sub(A, B, C)</code></td><td>ersetze A durch B in C</td></tr>
+          <tr><td><code>re.split(A, B)</code></td><td>splitte B an A</td></tr>
+          <tr><td><code>re.compile(A)</code></td><td>wiederverwendbares Objekt</td></tr>
+          </table><br>
+          <strong>Wichtige Flags:</strong><br>
+          <ul>
+          <li><code>re.I</code> / <code>re.IGNORECASE</code> — Groß/Klein egal</li>
+          <li><code>re.M</code> / <code>re.MULTILINE</code> — ^ und $ per Zeile</li>
+          <li><code>re.S</code> / <code>re.DOTALL</code> — Punkt matcht auch \\n</li>
+          <li><code>re.X</code> / <code>re.VERBOSE</code> — kommentierbare Patterns</li>
+          </ul>
+          Kombinieren: <code>re.I | re.M</code>`,
+          wann: `re.compile() wenn Pattern mehrfach verwendet wird. re.sub() für Bereinigung. re.findall() für Extraktion.`,
+          nicht: `re.match() ≠ re.search()! match() nur am Anfang. Ohne re.IGNORECASE werden Großbuchstaben nicht mitgefunden.`,
+          esel: `<strong>SIMS + sub</strong>: Search (irgendwo), I=Ignorecase, M=Multiline, S=dotall; sub = ersetzen. <strong>findall = gibt Liste</strong>, search = gibt Objekt (oder None).`
+        }
+      }
+    ],
+    flashcards: [
+      { q: "Was matcht '\\d+'?", a: "Eine oder mehrere Ziffern (0-9). \\d = digit, + = 1 oder mehr." },
+      { q: "Unterschied re.search vs re.match?", a: "search() findet Muster irgendwo im String. match() nur am Anfang des Strings." },
+      { q: "Wie entfernt man alle @-Mentions aus einem Text?", a: "re.sub(r'@\\w+', '', text)" },
+      { q: "Was bewirkt das Flag re.MULTILINE?", a: "^ und $ beziehen sich auf Zeilenanfang/-ende, nicht nur den gesamten String-Anfang/-Ende." },
+      { q: "Was ist re.compile() und wozu nutzt man es?", a: "Erzeugt wiederverwendbares Pattern-Objekt. Effizienter wenn dasselbe Pattern mehrfach gebraucht wird." },
+      { q: "Was gibt re.findall() zurück?", a: "Liste aller nicht-überlappenden Matches als Strings (oder Tupel bei Gruppen)." }
+    ],
+    quiz: [
+      { q: "Welche Funktion ersetzt alle Vorkommen eines Musters?", opts: ["re.search()", "re.match()", "re.sub()", "re.findall()"], correct: 2 },
+      { q: "Das Pattern r'\\s+' matcht:", opts: ["Ein oder mehrere Sonderzeichen", "Ein oder mehrere Leerzeichen/Whitespace", "Nur einen Space", "Keine Whitespace"], correct: 1 },
+      { q: "Welcher Flag lässt . auch Newlines matchen?", opts: ["re.I", "re.M", "re.S", "re.X"], correct: 2 },
+      { q: "r'@\\w+' würde '@ShopSupport123' matchen als:", opts: ["'@ShopSupport123'", "'@Shop'", "'ShopSupport123'", "Kein Match"], correct: 0 }
+    ],
+    transfer: {
+      q: `Du hast einen Reklamationstext mit folgendem Format:\n"ID: R-0001 | Timestamp: 2025-01-12 | Text: Mein Paket kam nicht an. #fail @Support http://example.com"\n\n▶ Schreibe einen Regex (als Pseudocode), um den Text-Teil nach 'Text:' zu extrahieren.\n▶ Schreibe einen Regex um alle URLs zu entfernen.\n▶ Erkläre, was r'[^\\w\\s]' matched und wozu es nützlich ist.`,
+      model: `<strong>Text-Teil extrahieren:</strong><br>
+      <code>text_part = re.search(r'Text:\\s*(.*)', raw_block, re.DOTALL)</code><br>
+      Oder einfacher: <code>raw_block.split('Text:')[1].strip()</code><br><br>
+      <strong>URLs entfernen:</strong><br>
+      <code>re.sub(r'https?://\\S+', '', text)</code><br>
+      (https? = http oder https, \\S+ = alles außer Whitespace)<br><br>
+      <strong>r'[^\\w\\s]' matcht:</strong> alle Zeichen, die WEDER Wortzeichen (\\w) NOCH Whitespace (\\s) sind = Sonderzeichen, Satzzeichen, Symbole. Nützlich zum Entfernen aller Sonderzeichen bei gleichzeitigem Behalten von Buchstaben, Ziffern und Leerzeichen.`
+    }
+  },
+  {
+    id: 5,
+    title: "Fragebogen & Datenerhebung",
+    icon: "📊",
+    subtitle: "Gütekriterien · Konstrukte · Items · Fehlerquellen · Missing Values",
+    concepts: [
+      {
+        title: "3 Hauptgütekriterien: Objektivität, Reliabilität, Validität",
+        items: {
+          was: `<strong>Objektivität:</strong> Testergebnis unabhängig von Person, die testet/auswertet/interpretiert.<br>
+          → Durchführungs-, Auswertungs-, Interpretationsobjektivität<br><br>
+          <strong>Reliabilität ("Zuverlässigkeit"):</strong> Messung ohne Messfehler.<br>
+          → Reliabilitätskoeffizient r_tt: 1 = perfekt, 0 = nur Fehler<br>
+          → Methoden: Retest, Paralleltest, Splithalf, Cronbachs Alpha<br><br>
+          <strong>Validität ("Gültigkeit"):</strong> Wird gemessen, was gemessen werden soll?<br>
+          → Inhalts-, Konstrukt-, Kriteriumsvalidität, Augenscheinvalidität<br><br>
+          <strong>Hierarchie:</strong> Objektivität → Reliabilität → Validität<br>
+          (Objektivität nötig aber nicht hinreichend für Reliabilität, diese nötig aber nicht hinreichend für Validität)`,
+          wann: `Bei Fragebogendesign, Datenbeschreibung, Bewertung von Erhebungsinstrumenten, Erklärung von Missing-Value-Problemen.`,
+          nicht: `Nicht verwechseln: Reliabel aber nicht valide ist möglich (konsistent falsches Messinstrument). Valide ohne Reliabilität: nicht möglich.`,
+          esel: `<strong>O-R-V Treppe:</strong> "Ohne Reliable Validität geht nichts" — aber Objektivität kommt zuerst. Oder: Thermometer misst konsistent 2°C zu viel = reliabel, aber nicht valide.`
+        }
+      },
+      {
+        title: "Konstrukt, Items, Skala",
+        items: {
+          was: `<strong>Item</strong> = einzelne Frage/Aufgabe im Fragebogen. Erfasst messbare Variable (Indikator).<br><br>
+          <strong>Skala</strong> = Zusammenfassung mehrerer Items für ein Konstrukt.<br><br>
+          <strong>Fragebogen/Test</strong> = mehrere Skalen.<br><br>
+          <strong>Manifestes Konstrukt</strong> = direkt beobachtbar, 1 Item reicht (Alter, Größe).<br>
+          <strong>Latentes Konstrukt</strong> = nicht direkt beobachtbar → Multi-Item-Skala (Zufriedenheit, Ehrgeiz, Stress).<br><br>
+          <strong>Antwortformate:</strong><br>
+          <ul>
+          <li>Offenes Format: Freitext</li>
+          <li>Gebundenes Format: Ratingskala, Multiple Choice, Ordnung</li>
+          </ul>`,
+          wann: `Fragebogendesign, Itemanalyse (Schwierigkeit, Varianz, Trennschärfe), Skalenanalyse (Cronbachs Alpha).`,
+          nicht: `Latente Konstrukte NICHT mit einem einzigen Item messen (z.B. "Sind Sie zufrieden? Ja/Nein" für Kundenzufriedenheit ist zu grob).`,
+          esel: `<strong>Item = Frage, Skala = Fragenpaket, FB = Fragenkoffer.</strong> Latent = versteckt unter der Oberfläche (wie Eisberg). Manifest = sichtbar.`
+        }
+      },
+      {
+        title: "Fehlerquellen bei Befragungen",
+        items: {
+          was: `<strong>Soziale Erwünschtheit:</strong><br>
+          → Simulation (fake good): besser erscheinen als man ist<br>
+          → Dissimulation (fake bad): schlechter erscheinen<br>
+          → Fremd- vs. Selbsttäuschung<br><br>
+          <strong>Antworttendenzen:</strong><br>
+          → Tendenz zur Mitte (Milde-Effekt): neutrale Kategorie wählen<br>
+          → Tendenz zu Extremen (Härte-Effekt)<br>
+          → Akquieszenz: unreflektierte Zustimmung (Ja-Sage-Tendenz)<br>
+          → Überspringen von Items → Missing Values`,
+          wann: `Bei Interpretation von Umfragedaten, Erklärung von Missing Values, Fragebogendesign.`,
+          nicht: `Nicht alle Missing Values = Fehler. Systematisches Überspringen = Hinweis auf Formulierungsproblem. Unsystematisches Überspringen = zufällig → MCAR.`,
+          esel: `<strong>SAT:</strong> Soziale Erwünschtheit, Antworttendenzen (Mitte/Extrem), Tendenz-Akquieszenz. Gegenmaßnahmen: Anonymität, invertierte Items, Kontrollskalen.`
+        }
+      },
+      {
+        title: "Missing Values: MCAR, MAR, MNAR",
+        items: {
+          was: `<table><tr><th>Typ</th><th>Bedeutung</th><th>Beispiel</th></tr>
+          <tr><td><strong>MCAR</strong></td><td>Fehlend völlig zufällig — kein Zusammenhang mit anderen Variablen</td><td>Zufällige Dateneingabefehler</td></tr>
+          <tr><td><strong>MAR</strong></td><td>Fehlend bedingt durch andere bekannte Variable</td><td>Ältere Patienten vergessen Harnweginfektion</td></tr>
+          <tr><td><strong>MNAR</strong></td><td>Fehlend aufgrund des fehlenden Wertes selbst</td><td>Raucher geben Rauchstatus nicht an</td></tr>
+          </table><br>
+          <strong>Techniken:</strong><br>
+          <ul>
+          <li><strong>Deleting:</strong> Listwise (ganze Zeile), Pairwise (nur relevante Paare), Dropping Variables</li>
+          <li><strong>Imputation:</strong> Single (Mittelwert, Median, Modus, konstant) oder Multiple Imputation</li>
+          <li><strong>Weighting</strong></li>
+          </ul>`,
+          wann: `Vor jeder Analyse mit fehlenden Werten. MCAR → Listwise Deletion akzeptabel. MAR → Imputation. MNAR → schwierig, Modellierung nötig.`,
+          nicht: `NICHT blind löschen bei MNAR — verzerrt die Stichprobe systematisch. Nicht Mittelwert-Imputation bei MNAR oder wenn Verteilung stark schief.`,
+          esel: `<strong>MCAR = Münzwurf</strong> (völlig zufällig). <strong>MAR = Alter beeinflusst Vergessen</strong> (bekannte Variable erklärbar). <strong>MNAR = der Wert selbst versteckt sich</strong> (Reiche antworten nicht auf Einkommensfrage).`
+        }
+      }
+    ],
+    flashcards: [
+      { q: "Was bedeutet Reliabilitätskoeffizient r_tt = 0?", a: "Das Testergebnis kommt ausschließlich durch Messfehler zustande — kein echter Messwert." },
+      { q: "Was ist der Unterschied zwischen manifiestem und latentem Konstrukt?", a: "Manifest = direkt beobachtbar, 1 Item reicht (Körpergröße). Latent = nicht direkt messbar, braucht Multi-Item-Skala (Zufriedenheit)." },
+      { q: "Was ist Akquieszenz?", a: "Unreflektierte Ja-Sage-Tendenz — Zustimmung ohne auf Inhalt zu achten. Gegenmaßnahme: invertierte Items." },
+      { q: "Welche Missing-Value-Technik ist bei MNAR problematisch?", a: "Listwise Deletion — systematische Verzerrung, da nicht-zufällig fehlende Daten entfernt werden." },
+      { q: "Was ist der Unterschied zwischen Inhaltsvalidität und Konstruktvalidität?", a: "Inhaltsvalidität: deckt der Test alle relevanten Inhaltsbereiche ab? Konstruktvalidität: misst der Test das theoretische Konstrukt korrekt?" },
+      { q: "Cronbachs Alpha misst was?", a: "Interne Konsistenz / Skalenhomogenität — wie sehr Items einer Skala dasselbe Konstrukt messen." }
+    ],
+    quiz: [
+      { q: "Ein Thermometer misst immer 2°C zu viel, aber jedes Mal gleich. Es ist:", opts: ["Valide aber nicht reliabel", "Reliabel aber nicht valide", "Weder reliabel noch valide", "Beides — reliabel und valide"], correct: 1 },
+      { q: "Ältere Patienten vergessen häufiger ihre Krankengeschichte → fehlende Werte sind:", opts: ["MCAR", "MAR", "MNAR", "Unit Nonresponse"], correct: 1 },
+      { q: "Welches Gütekriterium kommt in der Hierarchie zuerst?", opts: ["Validität", "Reliabilität", "Objektivität", "Normierung"], correct: 2 },
+      { q: "Was ist Listwise Deletion?", opts: ["Einzelne fehlende Werte durch Mittelwert ersetzen", "Ganze Zeile entfernen wenn irgendein Wert fehlt", "Nur relevante Spaltenpaarungen löschen", "Variable mit zu vielen Fehlern entfernen"], correct: 1 }
+    ],
+    transfer: {
+      q: `Du analysierst CPlus-Fragebogendaten (Zufriedenheitsstudie). Du findest: 15% der Antworten auf Item "Wie zufrieden sind Sie insgesamt?" fehlen. Bei Analyse der vorhandenen Daten: jüngere Teilnehmer (<30) haben signifikant häufiger nicht geantwortet.\n\n▶ Welcher Missing-Value-Typ liegt vermutlich vor?\n▶ Welche Technik empfiehlst du und warum?\n▶ Was ist das Problem wenn du diese Frage mit nur 1 Item misst?`,
+      model: `<strong>Missing-Value-Typ:</strong> MAR (Missing at Random) — das Fehlen hängt von einer bekannten Variable (Alter) ab, nicht vom fehlenden Wert selbst. Nicht MCAR (wäre zufällig), nicht MNAR (wäre wenn Unzufriedene nicht antworten).<br><br>
+      <strong>Empfehlung:</strong> Multiple Imputation oder Subgruppenanalyse (Jugendliche separat analysieren). NICHT Listwise Deletion — würde systematisch Junge entfernen und Ergebnisse verzerren.<br><br>
+      <strong>1-Item-Problem:</strong> "Insgesamt zufrieden" ist ein latentes Konstrukt — Zufriedenheit hat viele Dimensionen (Preis, Service, Qualität). 1 Item = geringe Reliabilität, hohe Messungenauigkeit. Besser: Multi-Item-Skala mit Cronbachs Alpha ≥ 0.7.`
+    }
+  }
+];
+
+// ═══════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════
+
+const state = {
+  currentModule: 0,
+  unlockedModules: new Set([0, 1]),
+  completedModules: new Set(),
+  currentMode: 'learn',
+  quizIndex: 0,
+  quizAnswered: false,
+  fcIndex: 0
+};
+
+function saveState() {
+  localStorage.setItem('danState', JSON.stringify({
+    unlockedModules: [...state.unlockedModules],
+    completedModules: [...state.completedModules],
+    currentModule: state.currentModule
+  }));
+}
+
+function loadState() {
+  try {
+    const s = JSON.parse(localStorage.getItem('danState') || '{}');
+    if (s.unlockedModules) state.unlockedModules = new Set(s.unlockedModules);
+    if (s.completedModules) state.completedModules = new Set(s.completedModules);
+    if (s.currentModule !== undefined) state.currentModule = s.currentModule;
+  } catch(e) {}
+}
+
+// ═══════════════════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════════════════
+
+function renderSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  const total = MODULES.filter(m => m.type !== 'overview').length;
+  const done = state.completedModules.size;
+  sidebar.innerHTML = `
+    <div class="sidebar-title">Module (${done}/${total} fertig)</div>
+    ${MODULES.map(m => {
+      const locked = m.id > 0 && !state.unlockedModules.has(m.id);
+      const done_ = state.completedModules.has(m.id);
+      const active = state.currentModule === m.id;
+      return `<button class="mod-btn ${active?'active':''} ${locked?'locked':''} ${done_?'done':''}"
+        onclick="navigateTo(${m.id})" ${locked?'disabled':''}>
+        <span class="mod-icon">${done_?'✅':locked?'🔒':m.icon}</span>
+        <div>
+          <div class="mod-num">Modul ${m.id}</div>
+          <div>${m.title}</div>
+        </div>
+      </button>`;
+    }).join('')}`;
+}
+
+function updateProgress() {
+  const total = MODULES.filter(m => m.type !== 'overview').length;
+  const pct = (state.completedModules.size / total) * 100;
+  document.getElementById('progressBar').style.width = pct + '%';
+}
+
+function navigateTo(id) {
+  if (id > 0 && !state.unlockedModules.has(id)) return;
+  state.currentModule = id;
+  state.currentMode = 'learn';
+  state.quizIndex = 0;
+  state.quizAnswered = false;
+  saveState();
+  renderSidebar();
+  renderMain();
+}
+
+function renderMain() {
+  const mod = MODULES.find(m => m.id === state.currentModule);
+  if (!mod) return;
+  if (mod.type === 'overview') { renderOverview(); return; }
+
+  const main = document.getElementById('mainContent');
+
+  const modeTabs = `
+    <div class="mode-tabs">
+      <button class="mode-tab ${state.currentMode==='learn'?'active':''}" onclick="switchMode('learn')">📖 Lernen</button>
+      <button class="mode-tab ${state.currentMode==='flash'?'active':''}" onclick="switchMode('flash')">🃏 Flashcards</button>
+      <button class="mode-tab ${state.currentMode==='quiz'?'active':''}" onclick="switchMode('quiz')">🎯 Quiz</button>
+      <button class="mode-tab ${state.currentMode==='transfer'?'active':''}" onclick="switchMode('transfer')">🚀 Transferfrage</button>
+    </div>`;
+
+  let content = '';
+  if (state.currentMode === 'learn') content = renderLearnMode(mod);
+  else if (state.currentMode === 'flash') content = renderFlashMode(mod);
+  else if (state.currentMode === 'quiz') content = renderQuizMode(mod);
+  else if (state.currentMode === 'transfer') content = renderTransferMode(mod);
+
+  main.innerHTML = `
+    <div class="mod-header">
+      <div class="mod-tag">Modul ${mod.id}</div>
+      <div class="mod-title">${mod.title}</div>
+      <div class="mod-subtitle">${mod.subtitle || ''}</div>
+    </div>
+    ${modeTabs}
+    ${content}`;
+}
+
+function renderLearnMode(mod) {
+  return mod.concepts.map((c, i) => `
+    <div class="concept" id="concept-${i}">
+      <div class="concept-header" onclick="toggleConcept(${i})">
+        <div class="concept-title">${c.title}</div>
+        <div class="concept-toggle">▼</div>
+      </div>
+      <div class="concept-body">
+        <div class="raster">
+          <div class="raster-item was">
+            <div class="raster-label">🔵 Was ist das?</div>
+            <div class="raster-content">${c.items.was}</div>
+          </div>
+          <div class="raster-item wann">
+            <div class="raster-label">🟢 Wann & Warum?</div>
+            <div class="raster-content">${c.items.wann}</div>
+          </div>
+          <div class="raster-item nicht">
+            <div class="raster-label">🟠 Wann NICHT?</div>
+            <div class="raster-content">${c.items.nicht}</div>
+          </div>
+          <div class="raster-item esel">
+            <div class="raster-label">🟣 Eselsbrücke</div>
+            <div class="raster-content">${c.items.esel}</div>
+          </div>
+        </div>
+      </div>
+    </div>`).join('') +
+    `<div class="info-box" style="margin-top:20px">
+      💡 Alle Konzepte durchgearbeitet? Teste dich mit <strong>Flashcards</strong> und <strong>Quiz</strong>, dann unlock die <strong>Transferfrage</strong>!
+    </div>`;
+}
+
+function toggleConcept(i) {
+  const el = document.getElementById('concept-' + i);
+  el.classList.toggle('open');
+}
+
+function switchMode(mode) {
+  state.currentMode = mode;
+  state.quizIndex = 0;
+  state.quizAnswered = false;
+  renderMain();
+}
+
+function renderFlashMode(mod) {
+  const cards = mod.flashcards;
+  return `
+    <div class="info-box">Klicke auf eine Karte um sie umzudrehen! Vorderseite = Frage, Rückseite = Antwort.</div>
+    <div class="fc-grid">
+      ${cards.map((c, i) => `
+        <div class="fc" id="fc-${i}" onclick="flipCard(${i})">
+          <div class="fc-inner">
+            <div class="fc-front">${c.q}</div>
+            <div class="fc-back">${c.a}</div>
+          </div>
+        </div>`).join('')}
+    </div>
+    <div class="fc-hint">Klicken = umdrehen</div>`;
+}
+
+function flipCard(i) {
+  document.getElementById('fc-' + i).classList.toggle('flipped');
+}
+
+function renderQuizMode(mod) {
+  const quiz = mod.quiz;
+  if (state.quizIndex >= quiz.length) {
+    return `
+      <div style="text-align:center; padding: 40px;">
+        <div style="font-size:3rem">🎉</div>
+        <div style="font-size:1.2rem; font-weight:700; margin:12px 0">Quiz abgeschlossen!</div>
+        <p>Bereit für die Transferfrage?</p>
+        <button class="btn btn-primary" style="margin-top:12px" onclick="switchMode('transfer')">→ Zur Transferfrage</button>
+        <button class="btn btn-secondary" style="margin-top:12px; background: var(--purple); color:white" onclick="restartQuiz()">Nochmal</button>
+      </div>`;
+  }
+
+  const q = quiz[state.quizIndex];
+  return `
+    <div class="concept" style="padding:20px">
+      <div style="font-size:0.75rem; color:var(--muted); margin-bottom:8px">Frage ${state.quizIndex+1} / ${quiz.length}</div>
+      <div class="quiz-q">${q.q}</div>
+      <div class="quiz-opts">
+        ${q.opts.map((o, i) => `
+          <button class="quiz-opt" id="qopt-${i}" onclick="answerQuiz(${i}, ${q.correct})">
+            ${String.fromCharCode(65+i)}. ${o}
+          </button>`).join('')}
+      </div>
+      <div class="quiz-result" id="qresult"></div>
+      <div class="quiz-nav" id="qnav" style="display:none">
+        <button class="btn btn-primary" onclick="nextQuiz()">Nächste →</button>
+      </div>
+    </div>`;
+}
+
+function answerQuiz(chosen, correct) {
+  if (state.quizAnswered) return;
+  state.quizAnswered = true;
+  for (let i = 0; i < 4; i++) {
+    const el = document.getElementById('qopt-'+i);
+    if (!el) continue;
+    if (i === correct) el.classList.add('correct');
+    else if (i === chosen) el.classList.add('wrong');
+  }
+  const res = document.getElementById('qresult');
+  if (res) {
+    res.classList.add('show');
+    res.classList.add(chosen === correct ? 'ok' : 'bad');
+    res.textContent = chosen === correct ? '✓ Richtig!' : '✗ Falsch — richtige Antwort ist markiert.';
+  }
+  const nav = document.getElementById('qnav');
+  if (nav) nav.style.display = 'flex';
+}
+
+function nextQuiz() {
+  state.quizIndex++;
+  state.quizAnswered = false;
+  renderMain();
+}
+
+function restartQuiz() {
+  state.quizIndex = 0;
+  state.quizAnswered = false;
+  renderMain();
+}
+
+function renderTransferMode(mod) {
+  const t = mod.transfer;
+  const done = state.completedModules.has(mod.id);
+  return `
+    <div class="transfer-section">
+      <div class="transfer-label">🚀 Transferfrage — Modul ${mod.id}</div>
+      <div class="transfer-q">${t.q.replace(/\n/g, '<br>')}</div>
+      <textarea class="transfer-area" id="transferAnswer" placeholder="Schreibe deine Antwort hier..."></textarea>
+      <div class="transfer-actions">
+        <button class="btn btn-secondary" onclick="showModel()">💡 Musterlösung anzeigen</button>
+        ${done ? '<span style="color:#86efac; font-weight:700; font-size:0.9rem">✅ Modul abgeschlossen!</span>' : `<button class="btn btn-unlock" onclick="completeModule(${mod.id})">🔓 Modul abschließen & nächstes freischalten</button>`}
+      </div>
+      <div class="feedback-box model" id="modelBox">
+        <div class="feedback-label">Musterlösung:</div>
+        ${t.model}
+      </div>
+    </div>`;
+}
+
+function showModel() {
+  const box = document.getElementById('modelBox');
+  if (box) box.classList.toggle('show');
+}
+
+function completeModule(id) {
+  state.completedModules.add(id);
+  const nextId = id + 1;
+  if (MODULES.find(m => m.id === nextId)) {
+    state.unlockedModules.add(nextId);
+  }
+  saveState();
+  updateProgress();
+  renderSidebar();
+  renderMain();
+}
+
+function renderOverview() {
+  const main = document.getElementById('mainContent');
+  const total = MODULES.filter(m => m.type !== 'overview').length;
+  const done = state.completedModules.size;
+  const pct = Math.round((done / total) * 100);
+
+  main.innerHTML = `
+    <div class="mod-header">
+      <div class="mod-tag">Übersicht</div>
+      <div class="mod-title">DAN Lernplattform</div>
+      <div class="mod-subtitle">Campus 02 · Prüfung: Mo. 29. Juni 2026 · 15-20 Min mündlich</div>
+    </div>
+
+    <div style="background:white; border-radius:12px; padding:20px; margin-bottom:24px; box-shadow:var(--shadow);">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+        <strong>Gesamtfortschritt</strong>
+        <span style="font-weight:700; color:var(--purple)">${done} / ${total} Module</span>
+      </div>
+      <div style="background:#e5e7eb; border-radius:8px; height:12px;">
+        <div style="background:var(--yellow); border-radius:8px; height:12px; width:${pct}%; transition:width 0.4s"></div>
+      </div>
+      <div style="color:var(--muted); font-size:0.82rem; margin-top:6px">${pct}% abgeschlossen</div>
+    </div>
+
+    <div class="overview-grid">
+      ${MODULES.filter(m=>m.type!=='overview').map(m => {
+        const locked = !state.unlockedModules.has(m.id);
+        const done_ = state.completedModules.has(m.id);
+        return `<div class="ov-card ${locked?'locked-card':''}" onclick="${locked?'':('navigateTo('+m.id+')')}">
+          <div class="ov-num">Modul ${m.id}</div>
+          <div class="ov-name">${m.icon} ${m.title}</div>
+          <div class="ov-topics">${m.subtitle || ''}</div>
+          <div class="ov-status ${done_?'done':locked?'locked':'open'}">
+            ${done_?'✅ Abgeschlossen':locked?'🔒 Gesperrt':'▶ Jetzt lernen'}
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+
+    <div style="margin-top:24px; background:white; border-radius:12px; padding:20px; box-shadow:var(--shadow);">
+      <strong>Lern-Methodik dieser Plattform:</strong>
+      <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:10px; margin-top:12px;">
+        ${[['📖','Feynman','4-Teil-Raster: Was/Wann/Nicht/Eselsbrücke'],['🏗️','Scaffolding','Module bauen aufeinander auf'],['🤔','Sokrates','Transferfragen fordern Eigendenken'],['🔁','Active Recall','Flashcards & Quiz vor Transfer']].map(([e,n,d])=>`
+          <div style="background:#f9fafb; border-radius:8px; padding:12px;">
+            <div style="font-size:1.4rem">${e}</div>
+            <div style="font-weight:700; font-size:0.85rem; margin:4px 0">${n}</div>
+            <div style="font-size:0.77rem; color:var(--muted)">${d}</div>
+          </div>`).join('')}
+      </div>
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════
+
+loadState();
+renderSidebar();
+updateProgress();
+renderMain();
+</script>
+</body>
+</html>

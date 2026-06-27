@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DAN Lernplattform — Prüfung 29.06.2026</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  .overview-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:24px; }
+  .stat-card { background:#fff; border-radius:10px; padding:16px; box-shadow:var(--shadow); text-align:center; }
+  .stat-num { font-size:1.8rem; font-weight:700; color:var(--purple); }
+  .stat-label { font-size:.78rem; color:var(--muted); margin-top:2px; }
+  .method-strip { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:16px 0; }
+  .ms-card { background:#fff; border-radius:8px; padding:12px; box-shadow:var(--shadow); text-align:center; }
+  .ms-icon { font-size:1.4rem; }
+  .ms-name { font-weight:700; font-size:.82rem; margin:4px 0 2px; color:var(--purple); }
+  .ms-desc { font-size:.72rem; color:var(--muted); }
+  .tip-box { background:linear-gradient(135deg,var(--purple),var(--purple2)); color:#fff; border-radius:10px; padding:16px 20px; margin-top:16px; font-size:.86rem; line-height:1.7; }
+  .tip-box strong { color:var(--yellow); }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <div class="logo">DAN <span>Lernplattform</span></div>
+    <div class="exam-badge">Prüfung Mo. 29.06.2026 · 15-20 Min</div>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-fill" id="progressFill" style="width:0%"></div>
+  </div>
+</header>
+
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar"></aside>
+  <main class="main-content" id="mainFrame">
+    <!-- Content injected by JS -->
+  </main>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+// GLOBAL STATE
+// ══════════════════════════════════════════
+const MODULES = [
+  { id:0, title:'Übersicht', icon:'🗺️', file:null, topics:'' },
+  { id:1, title:'Grundlagen', icon:'🏗️', file:'m1.html', topics:'Wissenstreppe · Dirty Data · 5 C\'s · Ethik · Data Life Cycle' },
+  { id:2, title:'Textdaten', icon:'📝', file:'m2.html', topics:'langue/parole · Korpus · Textualität · Type/Token · Semiotik' },
+  { id:3, title:'Tokenisierung', icon:'✂️', file:'m3.html', topics:'Stemming · Lemmatisierung · Linguist. Einheiten · Preprocessing' },
+  { id:4, title:'Regular Expressions', icon:'🔍', file:'m4.html', topics:'Syntax · re-Modul · Flags · Praxis-Pipeline' },
+  { id:5, title:'Fragebogen', icon:'📊', file:'m5.html', topics:'Gütekriterien · Konstrukte · Itemanalyse · Faktorenanalyse · Cronbach' },
+  { id:6, title:'Regression & Daten', icon:'📈', file:'m6.html', topics:'Missing Values · OLS · VIF · Heterosked. · CPlus · AirQuality · Taxi' },
+];
+
+const state = {
+  current: 0,
+  unlocked: new Set([0,1]),
+  completed: new Set(),
+};
+
+function saveState() {
+  localStorage.setItem('dan2_state', JSON.stringify({
+    current: state.current,
+    unlocked: [...state.unlocked],
+    completed: [...state.completed],
+  }));
+}
+function loadState() {
+  try {
+    const s = JSON.parse(localStorage.getItem('dan2_state') || '{}');
+    if (s.unlocked) state.unlocked = new Set(s.unlocked);
+    if (s.completed) state.completed = new Set(s.completed);
+    if (s.current !== undefined) state.current = s.current;
+  } catch(e) {}
+}
+
+// ══════════════════════════════════════════
+// SIDEBAR
+// ══════════════════════════════════════════
+function renderSidebar() {
+  const el = document.getElementById('sidebar');
+  const done = state.completed.size;
+  const total = MODULES.filter(m=>m.id>0).length;
+  el.innerHTML = `
+    <div class="sidebar-label">Module (${done}/${total})</div>
+    ${MODULES.map(m => {
+      const locked = m.id > 0 && !state.unlocked.has(m.id);
+      const done_ = state.completed.has(m.id);
+      const active = state.current === m.id;
+      return `<button class="nav-btn ${active?'active':''} ${locked?'locked':''} ${done_?'done':''}"
+        onclick="navigate(${m.id})" ${locked?'disabled':''}>
+        <span class="nav-icon">${done_?'✅':locked?'🔒':m.icon}</span>
+        <div>
+          <div style="font-weight:600">M${m.id} · ${m.title}</div>
+          <div class="nav-sub">${m.topics.split('·')[0].trim()}</div>
+        </div>
+      </button>`;
+    }).join('')}`;
+}
+
+function updateProgress() {
+  const pct = (state.completed.size / (MODULES.length-1)) * 100;
+  document.getElementById('progressFill').style.width = pct + '%';
+}
+
+// ══════════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════════
+function navigate(id) {
+  if (id > 0 && !state.unlocked.has(id)) return;
+  state.current = id;
+  saveState();
+  renderSidebar();
+  loadModuleContent(id);
+}
+
+function loadModuleContent(id) {
+  const frame = document.getElementById('mainFrame');
+  if (id === 0) { renderOverview(); return; }
+  const mod = MODULES.find(m => m.id === id);
+  if (!mod || !mod.file) return;
+  frame.innerHTML = '<div style="padding:40px;text-align:center;color:var(--muted)">Lade...</div>';
+  fetch(mod.file)
+    .then(r => r.text())
+    .then(html => {
+      frame.innerHTML = html;
+      // run inline scripts in loaded content
+      frame.querySelectorAll('script').forEach(s => {
+        const ns = document.createElement('script');
+        ns.textContent = s.textContent;
+        document.body.appendChild(ns);
+      });
+      updateProgress();
+    })
+    .catch(() => {
+      frame.innerHTML = '<div class="warn" style="margin:20px">Datei nicht gefunden.</div>';
+    });
+}
+
+// ══════════════════════════════════════════
+// OVERVIEW PAGE
+// ══════════════════════════════════════════
+function renderOverview() {
+  const frame = document.getElementById('mainFrame');
+  const done = state.completed.size;
+  const total = MODULES.filter(m=>m.id>0).length;
+  const pct = Math.round((done/total)*100);
+
+  frame.innerHTML = `
+    <div class="mod-tag">Startseite</div>
+    <div class="mod-title">Data Analytics & Data Cleaning</div>
+    <div class="mod-sub">Campus 02 FH Graz · Mündliche Prüfung Mo. 29.06.2026 · ca. 15-20 Min</div>
+
+    <div class="overview-stats">
+      <div class="stat-card">
+        <div class="stat-num">${done}/${total}</div>
+        <div class="stat-label">Module abgeschlossen</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">${pct}%</div>
+        <div class="stat-label">Gesamtfortschritt</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">${Math.max(0, total - done)}</div>
+        <div class="stat-label">Module verbleibend</div>
+      </div>
+    </div>
+
+    <div style="background:#fff;border-radius:10px;padding:16px 20px;box-shadow:var(--shadow);margin-bottom:20px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+        <strong>Fortschritt</strong>
+        <span style="color:var(--purple);font-weight:700">${pct}%</span>
+      </div>
+      <div style="background:#e5e7eb;border-radius:8px;height:10px">
+        <div style="background:var(--yellow);border-radius:8px;height:10px;width:${pct}%;transition:width .4s"></div>
+      </div>
+    </div>
+
+    <div class="method-strip">
+      ${[['📖','Feynman','4-Teil-Raster pro Konzept'],['🏗️','Scaffolding','Module bauen aufeinander auf'],['🤔','Sokrates','Transferfragen fordern Eigendenken'],['🔁','Active Recall','Flashcards & Quiz zuerst']].map(([i,n,d])=>`
+        <div class="ms-card"><div class="ms-icon">${i}</div><div class="ms-name">${n}</div><div class="ms-desc">${d}</div></div>`).join('')}
+    </div>
+
+    <div class="ov-grid">
+      ${MODULES.filter(m=>m.id>0).map(m => {
+        const locked = !state.unlocked.has(m.id);
+        const done_ = state.completed.has(m.id);
+        return `<div class="ov-card ${locked?'locked-card':''}" onclick="${locked?'':('navigate('+m.id+')')}">
+          <div class="ov-num">Modul ${m.id}</div>
+          <div class="ov-name">${m.icon} ${m.title}</div>
+          <div class="ov-topics">${m.topics}</div>
+          <div class="ov-status ${done_?'s-done':locked?'s-locked':'s-open'}">
+            ${done_?'✅ Abgeschlossen':locked?'🔒 Gesperrt':'▶ Jetzt lernen'}
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+
+    <div class="tip-box" style="margin-top:20px">
+      <strong>Prüfungstipp:</strong> Laut Leistungsbeurteilung ist die Prüfung 100% mündlich, >50% zum Bestehen.
+      Fokus liegt auf <strong>Verstehen + Erklären</strong>, nicht Auswendiglernen. Die Transferfragen am Ende jedes
+      Moduls simulieren den Prüfungsdialog — beantworte sie in eigenen Worten, bevor du die Musterlösung ansiehst.
+    </div>`;
+}
+
+// ══════════════════════════════════════════
+// GLOBAL HELPERS (called from module files)
+// ══════════════════════════════════════════
+window.DAN = {
+  completeModule(id) {
+    state.completed.add(id);
+    const next = id + 1;
+    if (MODULES.find(m => m.id === next)) state.unlocked.add(next);
+    saveState();
+    updateProgress();
+    renderSidebar();
+    // refresh the done-badge in current view
+    const badge = document.getElementById('doneBadge_' + id);
+    if (badge) badge.innerHTML = '<span class="done-badge">✅ Modul abgeschlossen!</span>';
+    const unlockBtn = document.getElementById('unlockBtn_' + id);
+    if (unlockBtn) unlockBtn.style.display = 'none';
+  },
+  isDone(id) { return state.completed.has(id); },
+  navigate,
+};
+
+// ══════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════
+loadState();
+renderSidebar();
+updateProgress();
+loadModuleContent(state.current);
+</script>
+</body>
+</html>

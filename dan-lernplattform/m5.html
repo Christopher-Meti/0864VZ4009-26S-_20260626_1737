@@ -1,0 +1,405 @@
+<div class="mod-tag">Modul 5</div>
+<div class="mod-title">Fragebogen & Quantitative Methoden</div>
+<div class="mod-sub">Gütekriterien · Konstrukte · Itemanalyse · Faktorenanalyse · Cronbach's α</div>
+
+<div class="mode-tabs">
+  <button class="tab-btn active" onclick="m5_tab('learn',this)">📖 Lernen</button>
+  <button class="tab-btn" onclick="m5_tab('flash',this)">🃏 Flashcards</button>
+  <button class="tab-btn" onclick="m5_tab('quiz',this)">🎯 Quiz</button>
+  <button class="tab-btn" onclick="m5_tab('transfer',this)">🚀 Transferfrage</button>
+</div>
+
+<div id="m5-learn">
+
+<div class="concept open" id="m5c0">
+  <div class="concept-hdr" onclick="toggleC('m5c0')">
+    <div class="concept-name">Gütekriterien — Hierarchie & Definitionen</div>
+    <div class="concept-arrow">▼</div>
+  </div>
+  <div class="concept-body">
+    <div class="raster">
+      <div class="r was"><div class="r-label">🔵 Was ist das?</div><div class="r-body">
+        Drei Hauptgütekriterien für Messinstrumente (Hierarchie beachten!):
+        <div class="info" style="margin:10px 0;font-size:.95em">
+          <strong>Objektivität → Reliabilität → Validität</strong><br>
+          (Jedes setzt das vorherige voraus)
+        </div>
+        <table>
+          <tr><th>Kriterium</th><th>Definition</th><th>Frage</th></tr>
+          <tr><td><strong>Objektivität</strong></td><td>Unabhängigkeit vom Forscher/Untersucher</td><td>Würde jemand anderes dasselbe Ergebnis bekommen?</td></tr>
+          <tr><td><strong>Reliabilität</strong></td><td>Messgenauigkeit / Konsistenz (Cronbach's α)</td><td>Wird dasselbe immer gleich gemessen?</td></tr>
+          <tr><td><strong>Validität</strong></td><td>Misst das Instrument was es messen soll?</td><td>Messen wir wirklich "Jobzufriedenheit"?</td></tr>
+        </table>
+        <br><strong>Typen der Objektivität:</strong>
+        <ul>
+          <li>Durchführungsobjektivität: standardisierte Bedingungen</li>
+          <li>Auswertungsobjektivität: eindeutige Kodierung</li>
+          <li>Interpretationsobjektivität: Vergleichswerte/Normen vorhanden</li>
+        </ul>
+        <strong>Typen der Validität:</strong>
+        <ul>
+          <li>Inhaltsvalidität: deckt alle Aspekte ab?</li>
+          <li>Kriteriumsvalidität: korreliert mit externem Kriterium?</li>
+          <li>Konstruktvalidität: misst latentes Konstrukt korrekt?</li>
+        </ul>
+      </div></div>
+      <div class="r wann"><div class="r-label">🟢 Wann & Warum?</div><div class="r-body">
+        Vor Fragebogen-Einsatz prüfen, ob Instrument reliable und valide misst.<br><br>
+        Im CPlus-Notebook: Reliabilität über Cronbach's α geprüft. Faktorenanalyse zur Konstruktvalidität.<br><br>
+        <strong>Praxis:</strong> Reliabilität ohne Objektivität sinnlos (wenn jeder Forscher anders auswertet). Validität ohne Reliabilität unmöglich (kann nicht valide messen was man nicht reliabel misst).
+      </div></div>
+      <div class="r nicht"><div class="r-label">🟠 Wann NICHT?</div><div class="r-body">
+        Reliabilität ≠ Validität! Ein Instrument kann reliabel (konsistent) sein, aber das Falsche messen.<br>
+        Beispiel: Schuhgröße misst zuverlässig — aber nicht Intelligenz (reliabel, nicht valide).
+      </div></div>
+      <div class="r esel"><div class="r-label">🟣 Eselsbrücke</div><div class="r-body">
+        <strong>O-R-V: "Ohne Reihenfolge Vergessen"</strong><br>
+        Objektivität → Reliabilität → Validität<br><br>
+        <strong>Reliabilität = Thermometer</strong> (misst immer 37°C, egal wer misst)<br>
+        <strong>Validität = richtiges Thermometer</strong> (kein Lineal für Körpertemp)
+      </div></div>
+    </div>
+  </div>
+</div>
+
+<div class="concept" id="m5c1">
+  <div class="concept-hdr" onclick="toggleC('m5c1')">
+    <div class="concept-name">Konstrukt — manifest vs. latent & Likert-Kodierung</div>
+    <div class="concept-arrow">▼</div>
+  </div>
+  <div class="concept-body">
+    <div class="raster">
+      <div class="r was"><div class="r-label">🔵 Was ist das?</div><div class="r-body">
+        <strong>Manifest vs. Latent:</strong>
+        <table>
+          <tr><th>Typ</th><th>Direkt messbar?</th><th>Beispiel</th></tr>
+          <tr><td>Manifest</td><td>Ja — direkt beobachtbar</td><td>Körpergröße, Alter, Einkommen</td></tr>
+          <tr><td>Latent</td><td>Nein — nur indirekt über Items</td><td>Jobzufriedenheit, Persönlichkeit, Stress</td></tr>
+        </table>
+        <br><strong>Likert-Kodierung im CPlus-Fragebogen:</strong>
+        <pre><code># Originalantworten → Numerisch
+likert_map = {
+    'Stimme voll und ganz zu': 5,
+    'Stimme zu': 4,
+    'Weder noch': 3,
+    'Stimme nicht zu': 2,
+    'Stimme überhaupt nicht zu': 1
+}
+
+# Fehlende Wertcodes aus CPlus:
+# -66 = Item nicht beantwortet (technisch fehlend)
+# -77 = trifft nicht zu (inhaltlich fehlend)
+# 8   = Weiß nicht
+
+df.replace([-66, -77, 8], np.nan, inplace=True)</code></pre>
+        <strong>Reverse Coding (negativ formulierte Items):</strong>
+        <pre><code># Items die umgekehrt gepolt sind
+reverse_items = ['Q15', 'Q22', 'Q31']
+df[reverse_items] = 6 - df[reverse_items]  # Bei 5-Punkt: 6 - x</code></pre>
+      </div></div>
+      <div class="r wann"><div class="r-label">🟢 Wann & Warum?</div><div class="r-body">
+        Latente Konstrukte brauchen mehrere Items (Skala), da kein einzelnes Item perfekt misst.<br><br>
+        Reverse Coding: verhindert Ja-Sage-Tendenz (Akquieszenz). Wer "Stimme zu" anklickt ohne nachzudenken, gibt bei reversed Items falsche Antwort → inkonsistenz sichtbar.<br><br>
+        Missing Codes ZUERST zu NaN konvertieren, sonst Mittelwerte verfälscht (-66 zieht Mittelwert runter).
+      </div></div>
+      <div class="r nicht"><div class="r-label">🟠 Wann NICHT?</div><div class="r-body">
+        Keine Mittelwerte über Likert-Items berechnen ohne vorher:<br>
+        (1) Missing codes zu NaN konvertieren<br>
+        (2) Reverse Coding anwenden<br><br>
+        Likert-Skala ≠ metrisch! Eigentlich ordinal. Praxis: oft trotzdem als metrisch behandelt wenn ≥5 Stufen.
+      </div></div>
+      <div class="r esel"><div class="r-label">🟣 Eselsbrücke</div><div class="r-body">
+        <strong>Latent = liegt verborgen</strong> (kann man nicht direkt sehen)<br>
+        <strong>Manifest = sichtbar</strong> (Größe, Gewicht — zeig's mir)<br><br>
+        Reverse: <strong>6 minus x</strong> bei 5-Punkt-Skala:<br>
+        1→5, 2→4, 3→3, 4→2, 5→1
+      </div></div>
+    </div>
+  </div>
+</div>
+
+<div class="concept" id="m5c2">
+  <div class="concept-hdr" onclick="toggleC('m5c2')">
+    <div class="concept-name">Itemanalyse — Schwierigkeit, Varianz, Trennschärfe</div>
+    <div class="concept-arrow">▼</div>
+  </div>
+  <div class="concept-body">
+    <div class="raster">
+      <div class="r was"><div class="r-label">🔵 Was ist das?</div><div class="r-body">
+        Prüft Qualität einzelner Items:<br><br>
+        <table>
+          <tr><th>Kennwert</th><th>Formel/Bereich</th><th>Ideal</th></tr>
+          <tr><td><strong>Itemschwierigkeit (Pi)</strong></td><td>Mittelwert(Item) / Max-Wert</td><td>0.2 – 0.8</td></tr>
+          <tr><td><strong>Itemvarianz</strong></td><td>Var(Item)</td><td>so hoch wie möglich</td></tr>
+          <tr><td><strong>Trennschärfe (rit)</strong></td><td>Korr(Item, Gesamtscore)</td><td>≥ 0.3 (Faustregel 0.4–0.7)</td></tr>
+        </table>
+        <pre><code># Trennschärfe berechnen
+def trennschaerfe(df, item):
+    gesamtscore = df.sum(axis=1) - df[item]  # ohne das Item selbst
+    return df[item].corr(gesamtscore)
+
+# Schwierigkeit
+df[item].mean() / df[item].max()</code></pre>
+        <strong>Interpretation Trennschärfe (rit):</strong>
+        <ul>
+          <li>rit < 0.3 → Item schlecht, überarbeiten oder löschen</li>
+          <li>0.3–0.4 → akzeptabel</li>
+          <li>0.4–0.7 → gut (Faustregel)</li>
+          <li>> 0.7 → zu ähnlich zu anderen Items (Redundanz)</li>
+        </ul>
+      </div></div>
+      <div class="r wann"><div class="r-label">🟢 Wann & Warum?</div><div class="r-body">
+        Vor Faktorenanalyse und Cronbach's α: schlechte Items eliminieren.<br><br>
+        Schwierigkeit: zu leichte (Pi ≈ 1) oder zu schwere (Pi ≈ 0) Items differenzieren nicht.<br><br>
+        Fehlerquellen die die Itemanalyse verzerren:<br>
+        <ul>
+          <li><strong>Soziale Erwünschtheit</strong>: Antworten nach gesellschaftlicher Norm, nicht ehrlich</li>
+          <li><strong>Akquieszenz</strong>: Ja-Sage-Tendenz, alles bestätigen</li>
+          <li><strong>Halo-Effekt</strong>: globaler Eindruck beeinflusst Einzelitems</li>
+          <li><strong>Extreme Response Style</strong>: immer 1 oder 5, nie Mitte</li>
+          <li><strong>Central Tendency Bias</strong>: immer Mitte (3)</li>
+        </ul>
+      </div></div>
+      <div class="r nicht"><div class="r-label">🟠 Wann NICHT?</div><div class="r-body">
+        Trennschärfe NICHT auf dem vollständigen Gesamtscore (inkl. das Item selbst) berechnen — künstlich überhöht (Part-Whole-Problem) → immer "corrected item-total correlation".
+      </div></div>
+      <div class="r esel"><div class="r-label">🟣 Eselsbrücke</div><div class="r-body">
+        <strong>rit = Trennschärfe</strong>: "Trennt Item scharf zwischen gut und schlecht?"<br>
+        Faustregel: <strong>0.4 bis 0.7</strong> = goldener Bereich<br><br>
+        Schwierigkeit Pi: <strong>Mittelwert / Maximum</strong><br>
+        Pi=0 → alle falsch, Pi=1 → alle richtig, ideal = Mitte!
+      </div></div>
+    </div>
+  </div>
+</div>
+
+<div class="concept" id="m5c3">
+  <div class="concept-hdr" onclick="toggleC('m5c3')">
+    <div class="concept-name">Faktorenanalyse — Bartlett, KMO, Kaiser, Parallelanalyse</div>
+    <div class="concept-arrow">▼</div>
+  </div>
+  <div class="concept-body">
+    <div class="raster">
+      <div class="r was"><div class="r-label">🔵 Was ist das?</div><div class="r-body">
+        Explorative Faktorenanalyse (EFA): findet latente Dimensionen (Faktoren) hinter Items.<br><br>
+        <strong>Voraussetzungstests:</strong>
+        <table>
+          <tr><th>Test</th><th>Prüft</th><th>Grenzwert</th></tr>
+          <tr><td><strong>Bartlett-Test</strong></td><td>Korrelationsmatrix ≠ Einheitsmatrix (p &lt; .05)</td><td>p &lt; .05 nötig</td></tr>
+          <tr><td><strong>KMO (gesamt)</strong></td><td>Stichprobenadäquanz</td><td>CPlus: 0.83 = gut</td></tr>
+          <tr><td><strong>Anti-Image (MSA)</strong></td><td>Eignung einzelner Items</td><td>> 0.5 pro Item</td></tr>
+        </table>
+        <br><strong>KMO-Interpretation:</strong>
+        <table>
+          <tr><th>Wert</th><th>Bewertung</th></tr>
+          <tr><td>≥ 0.90</td><td>sehr gut</td></tr>
+          <tr><td>0.80–0.89</td><td>gut ← CPlus: 0.83</td></tr>
+          <tr><td>0.70–0.79</td><td>mittel</td></tr>
+          <tr><td>0.60–0.69</td><td>mäßig</td></tr>
+          <tr><td>< 0.50</td><td>unzulässig</td></tr>
+        </table>
+        <br><strong>Faktoranzahl bestimmen:</strong>
+        <table>
+          <tr><th>Methode</th><th>Kriterium</th><th>Vorteil</th></tr>
+          <tr><td><strong>Kaiser-Kriterium</strong></td><td>Eigenwert > 1</td><td>einfach, schnell</td></tr>
+          <tr><td><strong>Parallelanalyse</strong></td><td>Eigenwert > Zufalls-Eigenwert</td><td>genauer, empfohlen</td></tr>
+          <tr><td>Scree-Plot</td><td>Knick im Plot</td><td>visuell</td></tr>
+        </table>
+        <br><strong>Faktorladungen (Factor Loadings):</strong>
+        <pre><code># Aus dem CPlus-Notebook (Beispiel):
+# Item → Faktor 1 (z.B. Arbeitszufriedenheit)
+# Q1: 0.72, Q2: 0.68, Q3: 0.71 → hohe Ladung auf F1
+# Faktorladung > |0.4| = interpretierbar</code></pre>
+      </div></div>
+      <div class="r wann"><div class="r-label">🟢 Wann & Warum?</div><div class="r-body">
+        EFA bei neuen Fragebogen-Entwicklungen: welche Items gehören zusammen?<br><br>
+        CPlus-Notebook Ablauf:<br>
+        1. Missing codes → NaN<br>
+        2. Reverse Coding<br>
+        3. Bartlett + KMO (KMO=0.83 → gut)<br>
+        4. EFA mit Varimax-Rotation<br>
+        5. Faktorladungen interpretieren (> |0.4|)<br>
+        6. Cronbach's α pro Faktor berechnen<br><br>
+        <strong>Varimax-Rotation</strong>: macht Faktoren interpretierbarer (orthogonal — unkorrelliert).
+      </div></div>
+      <div class="r nicht"><div class="r-label">🟠 Wann NICHT?</div><div class="r-body">
+        EFA ≠ CFA (Confirmatory Factor Analysis)! EFA = explorative Suche. CFA = Theorietest.<br><br>
+        Ohne Bartlett und KMO keine EFA starten. KMO < 0.5 = Daten ungeeignet.<br><br>
+        Kaiser-Kriterium überschätzt oft Faktorenzahl → Parallelanalyse bevorzugen.
+      </div></div>
+      <div class="r esel"><div class="r-label">🟣 Eselsbrücke</div><div class="r-body">
+        <strong>KMO = Kaiser-Meyer-Olkin</strong>: "Kaiser meint: okay?" → ≥ 0.8 = gut<br><br>
+        <strong>Bartlett = B wie Basis</strong>: muss zuerst bestehen (p &lt; .05) bevor überhaupt Faktorenanalyse sinnvoll.<br><br>
+        Kaiser-Kriterium: Eigenwert > 1 — "muss mehr erklären als eine einzelne Variable"
+      </div></div>
+    </div>
+  </div>
+</div>
+
+<div class="concept" id="m5c4">
+  <div class="concept-hdr" onclick="toggleC('m5c4')">
+    <div class="concept-name">Cronbach's Alpha — Interne Konsistenz</div>
+    <div class="concept-arrow">▼</div>
+  </div>
+  <div class="concept-body">
+    <div class="raster">
+      <div class="r was"><div class="r-label">🔵 Was ist das?</div><div class="r-body">
+        Maß für interne Konsistenz einer Skala (alle Items messen dasselbe Konstrukt?).<br><br>
+        Bereich: 0–1 (negativ möglich bei Fehler).<br><br>
+        <strong>Interpretation:</strong>
+        <table>
+          <tr><th>α-Wert</th><th>Bewertung</th></tr>
+          <tr><td>≥ 0.90</td><td>exzellent</td></tr>
+          <tr><td>0.80–0.89</td><td>gut</td></tr>
+          <tr><td>0.70–0.79</td><td>akzeptabel</td></tr>
+          <tr><td>0.60–0.69</td><td>fragwürdig</td></tr>
+          <tr><td>< 0.60</td><td>unzulässig</td></tr>
+        </table>
+        <br><strong>Reale Werte aus dem CPlus-Notebook:</strong>
+        <pre><code># Faktor 1 (Arbeitszufriedenheit): α = 0.854 → gut
+# Faktor 2 (Work-Life-Balance):    α = 0.812 → gut
+# Faktor 3 (Teamklima):            α = 0.788 → akzeptabel
+
+from pingouin import cronbach_alpha
+alpha, ci = cronbach_alpha(df[scale_items])</code></pre>
+        <br><strong>"Alpha if item deleted":</strong><br>
+        Wenn Löschen eines Items α erhöht → Item passt nicht zur Skala → kandidat für Entfernung.
+      </div></div>
+      <div class="r wann"><div class="r-label">🟢 Wann & Warum?</div><div class="r-body">
+        Nach Faktorenanalyse: Reliabilität jedes Faktors/jeder Subskala prüfen.<br><br>
+        Ziel: α ≥ 0.70 für akzeptable Skala.<br><br>
+        "Alpha if item deleted" prüfen: systematisch Items testen, ob Skala ohne sie besser wird.
+      </div></div>
+      <div class="r nicht"><div class="r-label">🟠 Wann NICHT?</div><div class="r-body">
+        α hängt von Itemanzahl ab! Mehr Items = höheres α (auch wenn Items schlecht). Nicht blind "mehr Items = besser".<br><br>
+        α ≠ Validität! Hohe interne Konsistenz bedeutet nicht, dass das Richtige gemessen wird.
+      </div></div>
+      <div class="r esel"><div class="r-label">🟣 Eselsbrücke</div><div class="r-body">
+        <strong>α wie "alles gleich"</strong>: alle Items messen dasselbe Ding.<br><br>
+        Grenzwert: <strong>0.70 = "Siebzig ist Minimum"</strong><br><br>
+        CPlus: 0.854, 0.812, 0.788 — alle ≥ 0.70 → Skalen akzeptabel bis gut.
+      </div></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /learn -->
+
+<div id="m5-flash" style="display:none">
+  <div class="info">Karte anklicken zum Umdrehen.</div>
+  <div class="fc-grid" id="m5fcGrid"></div>
+</div>
+
+<div id="m5-quiz" style="display:none">
+  <div class="quiz-wrap" id="m5QuizWrap"></div>
+</div>
+
+<div id="m5-transfer" style="display:none">
+  <div class="transfer-box">
+    <div class="transfer-label">🚀 Transferfrage — Modul 5</div>
+    <div class="transfer-q">Du analysierst den CPlus-Fragebogen mit 30 Items zur "Mitarbeiterzufriedenheit":
+- KMO = 0.83, Bartlett: p &lt; .001
+- EFA findet 3 Faktoren (Eigenwert > 1)
+- Faktor 1: Items Q1–Q8, α = 0.854
+- Faktor 3: Items Q20–Q25, α = 0.58, Q24 hat rit = 0.18 und "alpha if deleted" = 0.71
+- Q15 und Q22 sind negativ formuliert (Reverse Items)
+- Missing Codes: -66, -77, 8
+
+▶ Interpretiere KMO und Bartlett. Darf die EFA durchgeführt werden?
+▶ Was machst du mit Q15 und Q22 bevor du α berechnest?
+▶ Was machst du mit Faktor 3 (α=0.58) und Q24?
+▶ Was muss VOR der Faktorenanalyse mit Wert -66 passieren und warum?
+▶ Erkläre den Hierarchie-Zusammenhang: Objektivität → Reliabilität → Validität.</div>
+    <textarea class="transfer-ta" id="m5ta" placeholder="Schreibe deine Antwort hier..."></textarea>
+    <div class="transfer-actions">
+      <button class="btn btn-yellow" onclick="m5_showModel()">💡 Musterlösung</button>
+      <span id="doneBadge_5"></span>
+      <button class="btn btn-green" id="unlockBtn_5" onclick="DAN.completeModule(5)">🔓 Abschließen & Modul 6 freischalten</button>
+    </div>
+    <div class="model-answer" id="m5model">
+      <div class="model-label">Musterlösung:</div>
+      <strong>KMO & Bartlett:</strong><br>
+      KMO = 0.83 → "gut" (≥ 0.80). Stichprobenadäquanz für EFA gegeben. Bartlett p &lt; .001 → signifikant → Korrelationsmatrix ist NICHT die Einheitsmatrix → Items korrelieren → EFA sinnvoll. Beides bestanden → EFA darf durchgeführt werden.<br><br>
+      <strong>Q15 & Q22 (Reverse Items):</strong><br>
+      Vor Berechnung: Reverse Coding anwenden: neuer Wert = 6 - alter Wert (bei 5-Punkt-Likert). Dann erst Cronbach's α berechnen. Ohne Umkodierung ist α künstlich niedrig (Items korrelieren negativ mit Skala).<br><br>
+      <strong>Faktor 3 (α=0.58) & Q24:</strong><br>
+      α = 0.58 < 0.60 → unzulässig. Q24 hat rit = 0.18 (< 0.3, sehr schwache Trennschärfe). "Alpha if Q24 deleted" = 0.71 → Löschen von Q24 würde α von 0.58 auf 0.71 heben (akzeptabel). Entscheidung: Q24 löschen und α neu berechnen.<br><br>
+      <strong>Missing Code -66:</strong><br>
+      -66 bedeutet "Item nicht beantwortet" → inhaltlich fehlend, kein echter Wert. Muss zu np.nan konvertiert werden BEVOR Berechnungen. Sonst: Mittelwerte, Varianzen, Korrelationen alle falsch (-66 als Datenwert behandelt würde Ergebnisse massiv verzerren).<br>
+      Code: <code>df.replace([-66, -77, 8], np.nan, inplace=True)</code><br><br>
+      <strong>Hierarchie O→R→V:</strong><br>
+      Objektivität (Unabhängigkeit vom Forscher) ist Voraussetzung für Reliabilität (Messgenauigkeit). Nur wenn verschiedene Forscher dasselbe Ergebnis erzeugen (Objektivität), kann eine stabile, wiederholbare Messung entstehen (Reliabilität). Erst wenn reliabel gemessen wird, ist Validität möglich — denn eine unzuverlässige Messung kann das Richtige nicht konsistent erfassen. Beispiel: subjektive Auswertung (keine Objektivität) → verschiedene Reliabilitäten je nach Auswerter → Validität nicht bestimmbar.
+    </div>
+  </div>
+</div>
+
+<script>
+const m5flash = [
+  {q:'Was ist der Unterschied zwischen manifestem und latentem Konstrukt?', a:'Manifest: direkt messbar (Körpergröße, Alter). Latent: nicht direkt messbar, nur indirekt über Items (Jobzufriedenheit, Intelligenz).'},
+  {q:'Was ist Cronbach\'s Alpha?', a:'Maß für interne Konsistenz einer Skala. Prüft: Messen alle Items dasselbe Konstrukt? Bereich 0–1, Minimum α ≥ 0.70.'},
+  {q:'KMO = 0.83 — was bedeutet das?', a:'Gut! KMO-Wert 0.80–0.89 = gut. Stichprobenadäquanz ausreichend für Faktorenanalyse. (CPlus-Notebook: tatsächlicher Wert)'},
+  {q:'Warum Reverse Coding?', a:'Negativ formulierte Items verhindern Ja-Sage-Tendenz (Akquieszenz). Umkodierung nötig BEVOR Cronbach\'s α und Faktorenanalyse. Formel: 6 - x bei 5-Punkt-Likert.'},
+  {q:'Was ist die Trennschärfe rit?', a:'Korrelation zwischen einem Item und dem Gesamtscore (ohne dieses Item). Faustregel: 0.4–0.7 = gut. < 0.3 = Item überarbeiten.'},
+  {q:'Gütekriterien-Hierarchie?', a:'Objektivität → Reliabilität → Validität. Jedes setzt das vorherige voraus. Reliabilität ohne Objektivität sinnlos. Validität ohne Reliabilität unmöglich.'},
+  {q:'Was prüft der Bartlett-Test?', a:'Ob Korrelationsmatrix signifikant von Einheitsmatrix abweicht. Nötig für Faktorenanalyse. p < .05 nötig (Korrelationen existieren).'},
+  {q:'Fehlercodes im CPlus-Fragebogen?', a:'-66 = nicht beantwortet, -77 = trifft nicht zu, 8 = Weiß nicht. Alle zu np.nan konvertieren BEVOR Berechnungen.'},
+  {q:'Was macht "alpha if item deleted"?', a:'Zeigt wie sich α ändert wenn ein Item entfernt wird. Wenn Löschen α stark erhöht → Item passt nicht zur Skala → Kandidat für Entfernung.'},
+  {q:'Kaiser-Kriterium für Faktoranzahl?', a:'Faktoren mit Eigenwert > 1 behalten. Jeder Faktor muss mehr erklären als eine einzelne Variable. Alternative: Parallelanalyse (genauer).'},
+];
+
+const m5quiz = [
+  {q:'α = 0.58 nach Faktorenanalyse. Was tun?', opts:['Akzeptieren — nahe an 0.6','Items mit schlechter Trennschärfe löschen und neu prüfen','Mehr Items hinzufügen','Faktor komplett verwerfen'], c:1, exp:'Erst Items mit schlechter Trennschärfe (rit < 0.3) oder niedrigem "alpha if deleted"-Effekt entfernen. Dann α neu berechnen. Oft steigt α auf akzeptables Niveau.'},
+  {q:'In welcher Reihenfolge gelten die Gütekriterien?', opts:['Validität → Reliabilität → Objektivität','Objektivität → Reliabilität → Validität','Reliabilität → Objektivität → Validität','Alle gleichwertig'], c:1, exp:'O→R→V ist die Hierarchie. Jedes setzt das vorherige voraus. Ohne Objektivität keine stabile Reliabilität, ohne Reliabilität keine Validität.'},
+  {q:'Was ist Akquieszenz?', opts:['Tendenz extreme Werte zu wählen','Tendenz zuzustimmen unabhängig vom Inhalt','Tendenz die Mitte zu wählen','Soziale Erwünschtheit'], c:1, exp:'Akquieszenz = Ja-Sage-Tendenz. Person stimmt allem zu unabhängig vom Inhalt. Reverse Items helfen dagegen.'},
+  {q:'Varimax-Rotation in der EFA — was bewirkt sie?', opts:['Macht Faktoren korreliert','Macht Faktoren orthogonal (unkorrelliert) und interpretierbarer','Reduziert Faktoranzahl','Erhöht Cronbach\'s Alpha'], c:1, exp:'Varimax = orthogonale Rotation. Faktoren bleiben unkorreliert. Ziel: Faktorladungsstruktur einfacher interpretierbar (hohe Ladungen hoch, niedrige niedrig).'},
+  {q:'Q24 hat rit = 0.18. Was bedeutet das?', opts:['Gutes Item','Schwache Trennschärfe — Item überarbeiten oder löschen','Sehr gut — nahe an 0.2','Reverse Coding notwendig'], c:1, exp:'rit = 0.18 < 0.3 = schwache Trennschärfe. Item differenziert kaum zwischen Personen mit hohem/niedrigem Gesamtscore. Faustregel: < 0.3 = überarbeiten, < 0.4 = kritisch.'},
+  {q:'Warum -66 zu NaN konvertieren vor Berechnungen?', opts:['Wegen Speicherplatz','Weil -66 kein echter Wert ist und Mittelwerte/Korrelationen verzerren würde','Weil Python -66 nicht versteht','Optional, kein Einfluss'], c:1, exp:'-66 = "nicht beantwortet" (fehlend), kein echter Datenwert. Als numerisch behandelt zieht es Mittelwert runter, verzerrt Varianzen und Korrelationen. Muss NaN werden: df.replace([-66,-77,8], np.nan, inplace=True)'},
+];
+
+function m5_tab(name, btn) {
+  ['learn','flash','quiz','transfer'].forEach(t => {
+    document.getElementById('m5-'+t).style.display = t===name?'block':'none';
+  });
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (name==='flash') m5_renderFlash();
+  if (name==='quiz') m5_startQuiz();
+}
+function m5_renderFlash() {
+  document.getElementById('m5fcGrid').innerHTML = m5flash.map((c,i) => `
+    <div class="fc" onclick="this.classList.toggle('flipped')">
+      <div class="fc-inner"><div class="fc-front">${c.q}</div><div class="fc-back">${c.a}</div></div>
+    </div>`).join('');
+}
+let m5qi=0, m5ans=false;
+function m5_startQuiz() { m5qi=0; m5ans=false; m5_renderQuiz(); }
+function m5_renderQuiz() {
+  const wrap=document.getElementById('m5QuizWrap');
+  if (m5qi>=m5quiz.length) {
+    wrap.innerHTML=`<div style="text-align:center;padding:40px"><div style="font-size:2.5rem">🎉</div><div style="font-weight:700;margin:10px 0">Fertig!</div>
+      <button class="btn btn-purple" onclick="m5_tab('transfer',document.querySelectorAll('.tab-btn')[3])">→ Transferfrage</button>
+      <button class="btn btn-ghost" style="background:var(--border);color:var(--text);margin-left:8px" onclick="m5_startQuiz()">↺ Nochmal</button></div>`; return;
+  }
+  const q=m5quiz[m5qi];
+  wrap.innerHTML=`<div class="quiz-progress">Frage ${m5qi+1}/${m5quiz.length}</div>
+    <div class="quiz-q">${q.q}</div>
+    <div class="quiz-opts">${q.opts.map((o,i)=>`<button class="opt" id="m5o${i}" onclick="m5_ans(${i},${q.c})">${String.fromCharCode(65+i)}. ${o}</button>`).join('')}</div>
+    <div class="quiz-fb" id="m5fb"></div>
+    <div class="quiz-nav" id="m5nav"><button class="btn btn-purple" onclick="m5qi++;m5ans=false;m5_renderQuiz()">Nächste →</button></div>`;
+}
+function m5_ans(ch,co) {
+  if(m5ans)return; m5ans=true;
+  for(let i=0;i<5;i++){const e=document.getElementById('m5o'+i);if(!e)continue;e.disabled=true;if(i===co)e.classList.add('correct');else if(i===ch)e.classList.add('wrong');}
+  const q=m5quiz[m5qi],fb=document.getElementById('m5fb');
+  fb.classList.add('show',ch===co?'ok':'bad');
+  fb.innerHTML=(ch===co?'✓ Richtig! ':'✗ Falsch. ')+(q.exp||'');
+  document.getElementById('m5nav').classList.add('show');
+}
+function m5_showModel() { document.getElementById('m5model').classList.toggle('show'); }
+(function(){
+  if(window.DAN&&DAN.isDone(5)){
+    const b=document.getElementById('doneBadge_5');if(b)b.innerHTML='<span class="done-badge">✅ Abgeschlossen!</span>';
+    const u=document.getElementById('unlockBtn_5');if(u)u.style.display='none';
+  }
+})();
+</script>

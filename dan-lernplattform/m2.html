@@ -1,0 +1,349 @@
+<div class="mod-tag">Modul 2</div>
+<div class="mod-title">Textdaten: Grundlagen</div>
+<div class="mod-sub">langue/parole · Kompetenz/Performanz · Koch & Oesterreicher · Korpus-Hierarchie · Textualitätskriterien · Type vs. Token · Semiotik</div>
+
+<div class="mode-tabs">
+  <button class="tab-btn active" onclick="m2_tab('learn',this)">📖 Lernen</button>
+  <button class="tab-btn" onclick="m2_tab('flash',this)">🃏 Flashcards</button>
+  <button class="tab-btn" onclick="m2_tab('quiz',this)">🎯 Quiz</button>
+  <button class="tab-btn" onclick="m2_tab('transfer',this)">🚀 Transferfrage</button>
+</div>
+
+<!-- LEARN -->
+<div id="m2-learn">
+
+<div class="concept open" id="m2c0">
+  <div class="concept-hdr" onclick="toggleC('m2c0')">
+    <div class="concept-name">Sprache als Datenobjekt: langue / parole / Kompetenz / Performanz</div>
+    <div class="concept-arrow">▼</div>
+  </div>
+  <div class="concept-body">
+    <div class="raster">
+      <div class="r was"><div class="r-label">🔵 Was ist das?</div><div class="r-body">
+        <strong>de Saussure (1916):</strong><br>
+        <ul>
+          <li><strong>Langue</strong> = abstraktes Sprachsystem, Regelwerk, Grammatik</li>
+          <li><strong>Parole</strong> = konkreter Sprachgebrauch, einzelne Äußerung</li>
+        </ul>
+        <strong>Chomsky (1965):</strong> analoge Unterscheidung:<br>
+        <ul>
+          <li><strong>Kompetenz</strong> = angeborenes/erworbenes Sprachvermögen</li>
+          <li><strong>Performanz</strong> = tatsächliche Produktion (mit Fehlern, Pausen)</li>
+        </ul>
+        <strong>Koch & Oesterreicher (1985):</strong><br>
+        <ul>
+          <li><strong>Medium</strong> = phonisch (Schall) vs. graphisch (Schrift) → physisch</li>
+          <li><strong>Modus</strong> = konzeptionell gesprochen vs. konzeptionell geschrieben → Nähe/Distanz-Kontinuum</li>
+        </ul>
+        <div class="info">WhatsApp-Chat: Medium = graphisch (getippt), Modus = konzeptionell gesprochen (Nähesprache)!</div>
+      </div></div>
+      <div class="r wann"><div class="r-label">🟢 Wann & Warum?</div><div class="r-body">
+        Erklärt, warum geschriebene Texte (Korpora) ≠ gesprochene Sprache. Relevant für:<br>
+        <ul>
+          <li>Korpusdesign (welche Textsorten repräsentativ?)</li>
+          <li>NLP-Modellauswahl (auf welchen Texten trainiert?)</li>
+          <li>Bewertung von Trainingsdaten</li>
+        </ul>
+        Tweets und WhatsApp-Nachrichten = graphisches Medium, aber konzeptionell gesprochen → andere Bereinigungsschritte nötig!
+      </div></div>
+      <div class="r nicht"><div class="r-label">🟠 Wann NICHT?</div><div class="r-body">
+        Nicht langue mit "Textkollektionen" verwechseln. Langue ist <em>abstrakt</em> (nicht direkt beobachtbar). Parole = der beobachtbare Text im Korpus.<br><br>
+        Medium ≠ Modus: Ein Roman (graphisch) kann konzeptionell geschrieben sein. Ein Skript für einen mündlichen Vortrag (phonisch) ist konzeptionell geschrieben.
+      </div></div>
+      <div class="r esel"><div class="r-label">🟣 Eselsbrücke</div><div class="r-body">
+        <strong>Langue = Landkarte</strong> (abstrakt, alle Wege). <strong>Parole = Reise</strong> (konkret, eine Instanz).<br><br>
+        <strong>Chomsky:</strong> Kompetenz = Können, Performanz = Tun.<br><br>
+        <strong>Koch/Oesterreicher:</strong> Medium = Kanal (Ohr/Auge). Modus = Stil (locker/förmlich).
+      </div></div>
+    </div>
+  </div>
+</div>
+
+<div class="concept" id="m2c1">
+  <div class="concept-hdr" onclick="toggleC('m2c1')">
+    <div class="concept-name">Korpus-Hierarchie</div>
+    <div class="concept-arrow">▼</div>
+  </div>
+  <div class="concept-body">
+    <div class="raster">
+      <div class="r was"><div class="r-label">🔵 Was ist das?</div><div class="r-body">
+        <table>
+          <tr><th>Ebene</th><th>Beschreibung</th></tr>
+          <tr><td><strong>Korpus</strong></td><td>strukturierte Sammlung von Dokumenten</td></tr>
+          <tr><td><strong>Dokument</strong></td><td>einzelner Text</td></tr>
+          <tr><td><strong>Abschnitt</strong></td><td>Paragraph/Kapitel</td></tr>
+          <tr><td><strong>Satz</strong></td><td>grammatikalische Einheit</td></tr>
+          <tr><td><strong>Wortform</strong></td><td>Oberflächenform (z.B. "spielte")</td></tr>
+          <tr><td><strong>Token</strong></td><td>kleinstes Verarbeitungselement</td></tr>
+        </table>
+        <div class="warn">Token ≠ Wort! "können't" = 2 Tokens. Satzzeichen = eigene Tokens.</div>
+      </div></div>
+      <div class="r wann"><div class="r-label">🟢 Wann & Warum?</div><div class="r-body">
+        Bei NLP-Pipeline-Planung: auf welcher Ebene tokenisiert man?<br>
+        <ul>
+          <li>Sentiment-Analyse → Satzebene</li>
+          <li>Topic Modeling → Dokumentebene</li>
+          <li>Named Entity → Token-Ebene</li>
+        </ul>
+        Im Preprocessing-Notebook: erst auf Dokumentebene extrahieren (Text vs. Metadaten), dann auf Token-Ebene zerlegen.
+      </div></div>
+      <div class="r nicht"><div class="r-label">🟠 Wann NICHT?</div><div class="r-body">
+        Nicht annehmen, Token = Wort. Bei Social-Media-Texten: "#fail" könnte 1 Token (Hashtag) oder 2 Tokens (#, fail) sein — je nach Tokenizer.
+      </div></div>
+      <div class="r esel"><div class="r-label">🟣 Eselsbrücke</div><div class="r-body">
+        <strong>Bäckerei-Analogie:</strong><br>
+        Korpus = Bäckerei, Dokument = Kuchen, Abschnitt = Schicht, Satz = Scheibe, Wortform = Krümel, Token = Atom.
+      </div></div>
+    </div>
+  </div>
+</div>
+
+<div class="concept" id="m2c2">
+  <div class="concept-hdr" onclick="toggleC('m2c2')">
+    <div class="concept-name">Type vs. Token & Type-Token-Ratio</div>
+    <div class="concept-arrow">▼</div>
+  </div>
+  <div class="concept-body">
+    <div class="raster">
+      <div class="r was"><div class="r-label">🔵 Was ist das?</div><div class="r-body">
+        <strong>Token</strong> = jede einzelne Wortinstanz im Text (konkret)<br>
+        <strong>Type</strong> = eindeutige Wortform im Vokabular (abstrakt)<br><br>
+        Beispiel: <em>"der Mann sah den Mann"</em><br>
+        → 5 Tokens, 4 Types (Mann = 2 Tokens, 1 Type)<br><br>
+        <strong>Type-Token-Ratio (TTR)</strong> = Types ÷ Tokens<br>
+        Hier: 4/5 = 0.8 → hohes Vokabular<br><br>
+        <div class="info">TTR sinkt mit wachsender Textlänge — Wörter wiederholen sich zwangsläufig.</div>
+      </div></div>
+      <div class="r wann"><div class="r-label">🟢 Wann & Warum?</div><div class="r-body">
+        Korpusstatistiken, Vokabularbeschreibung, Sprachmodell-Bewertung.<br>
+        Vokabular eines Sprachmodells = Types (eindeutige Formen), nicht Tokens.<br><br>
+        Wenn Stoppwörter entfernt werden: weniger Tokens, TTR steigt (häufige Wörter fallen weg).
+      </div></div>
+      <div class="r nicht"><div class="r-label">🟠 Wann NICHT?</div><div class="r-body">
+        TTR <strong>nicht</strong> über verschiedene Textlängen vergleichen! Längere Texte haben niedrigere TTR — kein Qualitätsproblem, sondern mathematische Gesetzmäßigkeit.
+      </div></div>
+      <div class="r esel"><div class="r-label">🟣 Eselsbrücke</div><div class="r-body">
+        <strong>Type = Art/Gattung</strong> (Hund als Konzept).<br>
+        <strong>Token = Individuum</strong> (dieser eine Hund hier).<br><br>
+        Beim Zählen: Tokens = alle Wörter. Types = verschiedene Wörter.
+      </div></div>
+    </div>
+  </div>
+</div>
+
+<div class="concept" id="m2c3">
+  <div class="concept-hdr" onclick="toggleC('m2c3')">
+    <div class="concept-name">7 Textualitätskriterien (Beaugrande/Dressler 1981)</div>
+    <div class="concept-arrow">▼</div>
+  </div>
+  <div class="concept-body">
+    <div class="raster">
+      <div class="r was"><div class="r-label">🔵 Was ist das?</div><div class="r-body">
+        Was macht einen Text zu einem Text?<br><br>
+        <table>
+          <tr><th>Kriterium</th><th>Bedeutung</th><th>Verletzung</th></tr>
+          <tr><td><strong>Kohäsion</strong></td><td>grammat. Oberfläche (Pronomen, Konjunktionen)</td><td>fehlende Referenz</td></tr>
+          <tr><td><strong>Kohärenz</strong></td><td>inhaltlicher Zusammenhang</td><td>zufällige Sätze</td></tr>
+          <tr><td><strong>Intentionalität</strong></td><td>Absicht des Senders</td><td>—</td></tr>
+          <tr><td><strong>Akzeptabilität</strong></td><td>Erwartung des Empfängers</td><td>—</td></tr>
+          <tr><td><strong>Informativität</strong></td><td>Neuheitswert</td><td>100% Bekanntes</td></tr>
+          <tr><td><strong>Situationalität</strong></td><td>Einbettung in Kommunikationssituation</td><td>—</td></tr>
+          <tr><td><strong>Intertextualität</strong></td><td>Bezug auf andere Texte</td><td>—</td></tr>
+        </table>
+      </div></div>
+      <div class="r wann"><div class="r-label">🟢 Wann & Warum?</div><div class="r-body">
+        Erklärt warum NLP schwierig ist:<br>
+        <ul>
+          <li><strong>Kohäsion</strong> (Pronomen, Konnektoren) → formell nachvollziehbar → einfacher für Modelle</li>
+          <li><strong>Kohärenz</strong> → braucht Weltwissen → schwieriger (Transformers lernen das implizit)</li>
+          <li><strong>Intertextualität</strong> → braucht externes Wissen → LLMs nötig</li>
+        </ul>
+      </div></div>
+      <div class="r nicht"><div class="r-label">🟠 Wann NICHT?</div><div class="r-body">
+        Nicht alle 7 müssen in jedem Text explizit analysiert werden. Prüfungsrelevant: <strong>Kohäsion + Kohärenz</strong> sind die wichtigsten für NLP.
+      </div></div>
+      <div class="r esel"><div class="r-label">🟣 Eselsbrücke</div><div class="r-body">
+        <strong>K-K-I-A-I-S-I</strong> → "Kein Kleines Idyll Akzeptiert Informationsarmut Situationslos Isoliert"<br><br>
+        Merke: <strong>Ko</strong>häsion + <strong>Ko</strong>härenz = die zwei KOs, die NLP-Systeme bezwingen.
+      </div></div>
+    </div>
+  </div>
+</div>
+
+<div class="concept" id="m2c4">
+  <div class="concept-hdr" onclick="toggleC('m2c4')">
+    <div class="concept-name">Semiotik: de Saussure & Peirce</div>
+    <div class="concept-arrow">▼</div>
+  </div>
+  <div class="concept-body">
+    <div class="raster">
+      <div class="r was"><div class="r-label">🔵 Was ist das?</div><div class="r-body">
+        <strong>de Saussure (dyadisch):</strong><br>
+        Zeichen = <em>Signifikant</em> (Lautbild/Form) + <em>Signifikat</em> (Vorstellung/Inhalt)<br>
+        Beziehung: <strong>arbiträr</strong> (willkürlich, konventionell)<br><br>
+        <strong>Peirce (triadisch):</strong><br>
+        Zeichen = <em>Repräsentamen</em> + <em>Objekt</em> + <em>Interpretant</em><br>
+        (das Zeichen + das Bezeichnete + die erzeugte Bedeutung im Kopf)<br><br>
+        <strong>Peirce Zeichentypen:</strong>
+        <table>
+          <tr><th>Typ</th><th>Beziehung</th><th>Beispiel</th></tr>
+          <tr><td><strong>Ikon</strong></td><td>Ähnlichkeit</td><td>Foto, Karte, 😕</td></tr>
+          <tr><td><strong>Index</strong></td><td>kausal/existenziell</td><td>Rauch→Feuer, Fieber</td></tr>
+          <tr><td><strong>Symbol</strong></td><td>arbiträre Konvention</td><td>Wörter, Verkehrszeichen</td></tr>
+        </table>
+      </div></div>
+      <div class="r wann"><div class="r-label">🟢 Wann & Warum?</div><div class="r-body">
+        Erklärt warum Wörter bedeuten was sie bedeuten (arbiträre Konvention — kein natürlicher Grund, warum "Hund" ein Hund ist).<br><br>
+        Warum NLP mit Symbolen kämpft: Wörter (Symbole) haben keine inhärente Bedeutung — nur durch Kontext und Training gelernt.<br><br>
+        Emojis = Ikons → leichter für Modelle zu verstehen als abstrakte Symbole.
+      </div></div>
+      <div class="r nicht"><div class="r-label">🟠 Wann NICHT?</div><div class="r-body">
+        <strong>Nicht Symbol im Alltagssinn</strong> (Sinnbild/Logo) mit Peirce's Symbol (= arbiträres Zeichen, d.h. alle Wörter) verwechseln.<br><br>
+        Saussure ist <em>dyadisch</em> (2 Seiten), Peirce ist <em>triadisch</em> (3 Seiten).
+      </div></div>
+      <div class="r esel"><div class="r-label">🟣 Eselsbrücke</div><div class="r-body">
+        <strong>Ikon-Index-Symbol:</strong><br>
+        "Ich Sehe Index"<br>
+        Ikon <em>sieht aus wie</em> das Ding (Foto).<br>
+        Index <em>zeigt auf</em> das Ding (Rauch).<br>
+        Symbol ist <em>vereinbart</em> (Wort "Feuer").
+      </div></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- end learn -->
+
+<!-- FLASHCARDS -->
+<div id="m2-flash" style="display:none">
+  <div class="info">Karte anklicken zum Umdrehen.</div>
+  <div class="fc-grid" id="m2fcGrid"></div>
+  <div class="fc-hint">Klicken = umdrehen</div>
+</div>
+
+<!-- QUIZ -->
+<div id="m2-quiz" style="display:none">
+  <div class="quiz-wrap" id="m2QuizWrap"></div>
+</div>
+
+<!-- TRANSFER -->
+<div id="m2-transfer" style="display:none">
+  <div class="transfer-box">
+    <div class="transfer-label">🚀 Transferfrage — Modul 2</div>
+    <div class="transfer-q">Du analysierst Social-Media-Posts von Twitter/X. Dein Kollege sagt: "Wir tokenisieren nach Leerzeichen, das reicht. Und das Emoji 😕 ignorieren wir einfach."
+
+▶ Erkläre anhand der Korpus-Hierarchie, was bei Leerzeichen-Tokenisierung verloren geht.
+▶ Welches Textualitätskriterium ist bei Twitter-Posts oft verletzt? Warum ist das für NLP ein Problem?
+▶ Was ist 😕 semiotisch gesehen (Peirce)? Warum ist es sinnvoll, Emojis NICHT zu ignorieren?
+▶ Dein Kollege berechnet TTR über alle Posts und sagt: "Lange Posts haben schlechteres Vokabular als kurze." Was ist daran methodisch falsch?</div>
+    <textarea class="transfer-ta" id="m2ta" placeholder="Schreibe deine Antwort hier..."></textarea>
+    <div class="transfer-actions">
+      <button class="btn btn-yellow" onclick="m2_showModel()">💡 Musterlösung</button>
+      <span id="doneBadge_2"></span>
+      <button class="btn btn-green" id="unlockBtn_2" onclick="DAN.completeModule(2)">🔓 Abschließen & Modul 3 freischalten</button>
+    </div>
+    <div class="model-answer" id="m2model">
+      <div class="model-label">Musterlösung:</div>
+      <strong>Tokenisierung nach Leerzeichen:</strong> Satzzeichen werden nicht als separate Tokens erkannt ("Hallo!" → Token "Hallo!" statt ["Hallo", "!"]). Hashtags (#fail) und @Mentions werden nicht korrekt getrennt. Emojis, URLs und Kontraktion ("isn't" → 2 Tokens) werden falsch behandelt. Auf Token-Ebene entstehen Phantomtypen.<br><br>
+      <strong>Textualitätskriterium verletzt:</strong> Oft Kohäsion (keine vollständigen Sätze, fehlende Pronominalbezüge) und Situationalität (Posts ohne Kontext unverständlich). NLP-Problem: Kohärenz-Modelle brauchen vollständige Sätze → Tweets brechen Erwartungen.<br><br>
+      <strong>😕 semiotisch:</strong> Ikon (Peirce) — sieht einem traurigen Gesicht ähnlich → Ähnlichkeitsbeziehung. Emojis tragen Sentiment-Information. Ignorieren = Informationsverlust. Gerade bei Sentiment-Analyse sind Emojis oft die stärksten Indikatoren.<br><br>
+      <strong>TTR-Fehler:</strong> TTR ist textlängenabhängig — längere Texte haben zwangsläufig niedrigere TTR, weil Wörter sich wiederholen. Das ist keine Qualitätseigenschaft, sondern eine mathematische Eigenschaft. Vergleich von TTR über verschiedene Textlängen ist methodisch unzulässig.
+    </div>
+  </div>
+</div>
+
+<script>
+const m2flash = [
+  {q:'Was ist der Unterschied zwischen langue und parole?', a:'Langue = abstraktes Sprachsystem/Regelwerk (nicht beobachtbar). Parole = konkreter Sprachgebrauch/einzelne Äußerung (beobachtbar im Korpus).'},
+  {q:'Was unterscheidet Type von Token?', a:'Token = jede einzelne Wortinstanz. Type = eindeutige Wortform. "der Mann sah den Mann" = 5 Tokens, 4 Types.'},
+  {q:'Was ist Kohäsion vs. Kohärenz?', a:'Kohäsion = grammatisch-formale Verknüpfung (Pronomen, Konjunktionen). Kohärenz = inhaltlicher Zusammenhang/Sinnhaftigkeit.'},
+  {q:'Was ist Intertextualität?', a:'Bezug eines Textes auf andere Texte (Zitate, Anspielungen, Gattungskonventionen).'},
+  {q:'Koch & Oesterreicher: Medium vs. Modus?', a:'Medium = physischer Kanal (phonisch/graphisch). Modus = konzeptionell (Nähe-/Distanzsprache), unabhängig vom Medium.'},
+  {q:'Was ist die TTR und was misst sie?', a:'TTR = Types / Tokens. Misst Vokabularreichtum. Problem: textlängenabhängig — längere Texte haben niedrigere TTR.'},
+  {q:'Peirce: Was ist ein Index?', a:'Zeichen mit kausaler/existenzieller Beziehung. Rauch = Index für Feuer. Fieber = Index für Krankheit.'},
+  {q:'Was ist der Unterschied zwischen Saussure und Peirce?', a:'Saussure: dyadisch (Signifikant + Signifikat). Peirce: triadisch (Repräsentamen + Objekt + Interpretant).'},
+  {q:'Was bedeutet arbiträr in der Semiotik?', a:'Die Beziehung zwischen Zeichen und Bedeutung ist willkürlich/konventionell — kein natürlicher Grund, warum "Hund" einen Hund bezeichnet.'},
+  {q:'WhatsApp-Nachrichten: welches Medium, welcher Modus?', a:'Medium = graphisch (getippt). Modus = konzeptionell gesprochen (Nähesprache, informell).'},
+];
+
+const m2quiz = [
+  {q:'Welches Textualitätskriterium beschreibt die grammatische Oberflächenverknüpfung?', opts:['Kohärenz','Kohäsion','Intentionalität','Intertextualität'], c:1, exp:'Kohäsion = formale Verknüpfung (Pronomen, Konnektoren). Kohärenz = inhaltlicher Sinn.'},
+  {q:'"der Mann sah den Mann" — wie viele Tokens und Types?', opts:['4 Tokens, 3 Types','5 Tokens, 4 Types','5 Tokens, 5 Types','4 Tokens, 4 Types'], c:1, exp:'5 Tokens (der, Mann, sah, den, Mann). 4 Types (der, Mann, sah, den) — Mann kommt 2× vor.'},
+  {q:'Was entspricht "parole" bei Chomsky?', opts:['Kompetenz','Performanz','Langue','Medium'], c:1, exp:'Parole (Saussure) = Performanz (Chomsky): die tatsächliche, konkrete Sprachproduktion.'},
+  {q:'Ein Foto ist welcher Peirce-Zeichentyp?', opts:['Symbol','Index','Ikon','Signifikat'], c:2, exp:'Ikon = Ähnlichkeitsbeziehung. Foto sieht aus wie das Abgebildete.'},
+  {q:'Was ist das kleinste Element in der Korpus-Hierarchie?', opts:['Wortform','Satz','Token','Morphem'], c:2, exp:'Token = kleinstes Verarbeitungselement. Kann Buchstabe, Teilwort, Wort, Satzzeichen sein.'},
+  {q:'Welcher Zeichentyp ist Rauch als Zeichen für Feuer?', opts:['Ikon','Index','Symbol','Signifikant'], c:1, exp:'Index = kausale/existenzielle Beziehung. Rauch entsteht durch Feuer — natürliche Verbindung, keine Konvention.'},
+];
+
+function m2_tab(name, btn) {
+  ['learn','flash','quiz','transfer'].forEach(t => {
+    document.getElementById('m2-'+t).style.display = t===name?'block':'none';
+  });
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (name==='flash') m2_renderFlash();
+  if (name==='quiz') m2_startQuiz();
+}
+
+function m2_renderFlash() {
+  const g = document.getElementById('m2fcGrid');
+  g.innerHTML = m2flash.map((c,i) => `
+    <div class="fc" id="m2fc${i}" onclick="this.classList.toggle('flipped')">
+      <div class="fc-inner">
+        <div class="fc-front">${c.q}</div>
+        <div class="fc-back">${c.a}</div>
+      </div>
+    </div>`).join('');
+}
+
+let m2qi = 0, m2answered = false;
+function m2_startQuiz() { m2qi = 0; m2answered = false; m2_renderQuiz(); }
+function m2_renderQuiz() {
+  const wrap = document.getElementById('m2QuizWrap');
+  if (m2qi >= m2quiz.length) {
+    wrap.innerHTML = `<div style="text-align:center;padding:40px">
+      <div style="font-size:2.5rem">🎉</div>
+      <div style="font-weight:700;font-size:1.1rem;margin:10px 0">Quiz abgeschlossen!</div>
+      <button class="btn btn-purple" style="margin-top:10px" onclick="m2_tab('transfer',document.querySelectorAll('.tab-btn')[3])">→ Transferfrage</button>
+      <button class="btn btn-ghost" style="background:var(--border);color:var(--text);margin-top:10px;margin-left:8px" onclick="m2_startQuiz()">↺ Wiederholen</button>
+    </div>`; return;
+  }
+  const q = m2quiz[m2qi];
+  wrap.innerHTML = `
+    <div class="quiz-progress">Frage ${m2qi+1} / ${m2quiz.length}</div>
+    <div class="quiz-q">${q.q}</div>
+    <div class="quiz-opts">
+      ${q.opts.map((o,i)=>`<button class="opt" id="m2opt${i}" onclick="m2_answer(${i},${q.c})">${String.fromCharCode(65+i)}. ${o}</button>`).join('')}
+    </div>
+    <div class="quiz-fb" id="m2fb"></div>
+    <div class="quiz-nav" id="m2nav">
+      <button class="btn btn-purple" onclick="m2qi++;m2answered=false;m2_renderQuiz()">Nächste →</button>
+    </div>`;
+}
+function m2_answer(chosen, correct) {
+  if (m2answered) return;
+  m2answered = true;
+  for (let i=0;i<4;i++) {
+    const el = document.getElementById('m2opt'+i);
+    if (!el) continue;
+    el.disabled = true;
+    if (i===correct) el.classList.add('correct');
+    else if (i===chosen) el.classList.add('wrong');
+  }
+  const q = m2quiz[m2qi];
+  const fb = document.getElementById('m2fb');
+  fb.classList.add('show', chosen===correct?'ok':'bad');
+  fb.innerHTML = (chosen===correct?'✓ Richtig! ':'✗ Falsch. ') + (q.exp||'');
+  document.getElementById('m2nav').classList.add('show');
+}
+function m2_showModel() { document.getElementById('m2model').classList.toggle('show'); }
+
+(function(){
+  if (window.DAN && DAN.isDone(2)) {
+    const b = document.getElementById('doneBadge_2');
+    if (b) b.innerHTML = '<span class="done-badge">✅ Modul abgeschlossen!</span>';
+    const u = document.getElementById('unlockBtn_2');
+    if (u) u.style.display = 'none';
+  }
+})();
+</script>

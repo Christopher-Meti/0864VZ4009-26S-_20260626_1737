@@ -1,0 +1,255 @@
+<div class="mod-tag">Modul 4</div>
+<div class="mod-title">Regular Expressions</div>
+<div class="mod-sub">Syntax · re-Modul Funktionen · Flags · Praxis-Pipeline · Reklamationstext bereinigen</div>
+
+<div class="mode-tabs">
+  <button class="tab-btn active" onclick="m4_tab('learn',this)">📖 Lernen</button>
+  <button class="tab-btn" onclick="m4_tab('flash',this)">🃏 Flashcards</button>
+  <button class="tab-btn" onclick="m4_tab('quiz',this)">🎯 Quiz</button>
+  <button class="tab-btn" onclick="m4_tab('transfer',this)">🚀 Transferfrage</button>
+</div>
+
+<div id="m4-learn">
+
+<div class="concept open" id="m4c0">
+  <div class="concept-hdr" onclick="toggleC('m4c0')">
+    <div class="concept-name">Regex Grundsyntax</div>
+    <div class="concept-arrow">▼</div>
+  </div>
+  <div class="concept-body">
+    <div class="raster">
+      <div class="r was"><div class="r-label">🔵 Was ist das?</div><div class="r-body">
+        <table>
+          <tr><th>Pattern</th><th>Bedeutung</th><th>Beispiel</th></tr>
+          <tr><td><code>.</code></td><td>beliebiges Zeichen (außer \n)</td><td><code>a.c</code> → "abc"</td></tr>
+          <tr><td><code>*</code></td><td>0 oder mehr</td><td><code>a*</code> → "", "a", "aaa"</td></tr>
+          <tr><td><code>+</code></td><td>1 oder mehr</td><td><code>a+</code> → "a", "aaa"</td></tr>
+          <tr><td><code>?</code></td><td>0 oder 1 (optional)</td><td><code>colou?r</code> → "color"/"colour"</td></tr>
+          <tr><td><code>^</code></td><td>Anfang des Strings</td><td><code>^Hallo</code></td></tr>
+          <tr><td><code>$</code></td><td>Ende des Strings</td><td><code>Ende$</code></td></tr>
+          <tr><td><code>\d</code></td><td>Ziffer [0-9]</td><td><code>\d+</code> = Zahlen</td></tr>
+          <tr><td><code>\w</code></td><td>Wortzeichen [a-zA-Z0-9_]</td><td><code>\w+</code> = Wörter</td></tr>
+          <tr><td><code>\s</code></td><td>Whitespace</td><td><code>\s+</code> = Leerzeichen</td></tr>
+          <tr><td><code>\W, \D, \S</code></td><td>Negation (NICHT Wort/Ziffer/Space)</td><td><code>[^\w\s]</code> = Sonderzeichen</td></tr>
+          <tr><td><code>[abc]</code></td><td>Zeichenklasse</td><td><code>[aeiou]</code> = Vokale</td></tr>
+          <tr><td><code>[^abc]</code></td><td>alles AUSSER</td><td><code>[^\w\s]</code> = Sonderzeichen</td></tr>
+          <tr><td><code>(ab)</code></td><td>Gruppe / Capturing Group</td><td>für Extraktion/Referenz</td></tr>
+          <tr><td><code>(?:ab)</code></td><td>Non-Capturing Group</td><td>Gruppierung ohne Erfassen</td></tr>
+          <tr><td><code>a|b</code></td><td>Oder</td><td><code>http|https</code></td></tr>
+        </table>
+        <div class="info">Immer Raw-Strings verwenden: <code>r"..."</code> — verhindert Backslash-Konflikte!</div>
+      </div></div>
+      <div class="r wann"><div class="r-label">🟢 Wann & Warum?</div><div class="r-body">
+        Text-Bereinigung, Muster extrahieren (URLs, @Mentions, E-Mails), Validierung, Log-Parsing, Datenextraktion aus unstrukturierten Texten.<br><br>
+        Im LV-Notebook: Reklamationspost bereinigen:<br>
+        <pre><code>post = """ID: R-0001 | Timestamp: 2025-01-12
+Text:
+Guten Tag***, mein Paket noch nich angekommen 😕
+#fail @ShopSupport http://bit.ly/xyz"""</code></pre>
+      </div></div>
+      <div class="r nicht"><div class="r-label">🟠 Wann NICHT?</div><div class="r-body">
+        <strong>NICHT für HTML-Parsing</strong> → BeautifulSoup! (HTML ist nicht regulär)<br>
+        NICHT für sehr komplexe Strukturen (verschachtelt) → Parser-Bibliotheken<br>
+        NICHT ohne Raw-String: <code>"\d"</code> ≠ <code>r"\d"</code> (Backslash wird von Python interpretiert)
+      </div></div>
+      <div class="r esel"><div class="r-label">🟣 Eselsbrücke</div><div class="r-body">
+        <strong>\d = digit, \w = word, \s = space</strong><br>
+        Groß = Negation: \D = kein digit, \W = kein word<br><br>
+        <strong>+ = mindestens eins, * = vielleicht keins</strong><br>
+        "Plus hat Plusbedeutung" → immer mindestens 1.
+      </div></div>
+    </div>
+  </div>
+</div>
+
+<div class="concept" id="m4c1">
+  <div class="concept-hdr" onclick="toggleC('m4c1')">
+    <div class="concept-name">re-Modul: Funktionen & Flags</div>
+    <div class="concept-arrow">▼</div>
+  </div>
+  <div class="concept-body">
+    <div class="raster">
+      <div class="r was"><div class="r-label">🔵 Was ist das?</div><div class="r-body">
+        <strong>Funktionen:</strong>
+        <table>
+          <tr><th>Funktion</th><th>Rückgabe</th><th>Zweck</th></tr>
+          <tr><td><code>re.search(A, B)</code></td><td>Match-Objekt oder None</td><td>erstes Match irgendwo</td></tr>
+          <tr><td><code>re.match(A, B)</code></td><td>Match-Objekt oder None</td><td>Match NUR am Anfang</td></tr>
+          <tr><td><code>re.fullmatch(A, B)</code></td><td>Match-Objekt oder None</td><td>ganzer String = Pattern</td></tr>
+          <tr><td><code>re.findall(A, B)</code></td><td>Liste von Strings</td><td>alle Matches</td></tr>
+          <tr><td><code>re.sub(A, B, C)</code></td><td>String</td><td>ersetze A durch B in C</td></tr>
+          <tr><td><code>re.subn(A, B, C)</code></td><td>(String, Anzahl)</td><td>wie sub + Zähler</td></tr>
+          <tr><td><code>re.split(A, B)</code></td><td>Liste</td><td>splitte bei Match</td></tr>
+          <tr><td><code>re.compile(A)</code></td><td>Pattern-Objekt</td><td>wiederverwendbar</td></tr>
+        </table>
+        <br><strong>Flags:</strong>
+        <table>
+          <tr><th>Flag</th><th>Kurzform</th><th>Wirkung</th></tr>
+          <tr><td><code>re.IGNORECASE</code></td><td><code>re.I</code></td><td>Groß/Klein ignorieren</td></tr>
+          <tr><td><code>re.MULTILINE</code></td><td><code>re.M</code></td><td>^ und $ pro Zeile</td></tr>
+          <tr><td><code>re.DOTALL</code></td><td><code>re.S</code></td><td>. matcht auch \n</td></tr>
+          <tr><td><code>re.VERBOSE</code></td><td><code>re.X</code></td><td>kommentierbare Patterns</td></tr>
+        </table>
+        Kombinieren: <code>re.I | re.M</code>
+      </div></div>
+      <div class="r wann"><div class="r-label">🟢 Wann & Warum?</div><div class="r-body">
+        <code>re.compile()</code>: wenn Pattern mehrfach über viele Texte angewendet wird → Performance.<br><br>
+        <code>re.MULTILINE</code>: wenn Text mehrere Zeilen hat und ^ / $ pro Zeile gelten sollen (z.B. Log-Files).<br><br>
+        <code>re.DOTALL</code>: wenn mehrzeilige Matches nötig (z.B. HTML-Tags über mehrere Zeilen).<br><br>
+        Aus dem LV-Notebook — Text-Teil extrahieren:<br>
+        <pre><code>text_match = re.search(r'Text:\s*(.*)', post, re.DOTALL)
+text_part = text_match.group(1).strip()</code></pre>
+      </div></div>
+      <div class="r nicht"><div class="r-label">🟠 Wann NICHT?</div><div class="r-body">
+        <code>re.match()</code> ≠ <code>re.search()</code>: match() nur am Anfang! Häufiger Fehler.<br><br>
+        Ohne <code>re.IGNORECASE</code>: "Hallo" ≠ "hallo" — beide nicht gefunden wenn nur eines gesucht.
+      </div></div>
+      <div class="r esel"><div class="r-label">🟣 Eselsbrücke</div><div class="r-body">
+        <strong>SIMS:</strong> Search (irgendwo), IGNORECASE, Multiline, S=dotall.<br><br>
+        <strong>findall = gibt Liste</strong> (Plural → Liste)<br>
+        <strong>search = gibt Objekt oder None</strong> (singular)<br><br>
+        sub = substituieren (ersetzen), split = teilen
+      </div></div>
+    </div>
+
+    <h3>Praxis: Reklamationstext Bereinigung (aus dem Notebook)</h3>
+    <pre><code>import re
+
+post = """ID: R-0001 | Timestamp: 2025-01-12 | Text:
+Guten Tag***, mein Paket ist leider noch nich angekommen 😕 .
+#Service?? #fail @ShopSupport* http://example.com/path?a=1
+Bitte pr&uuml;fen, danke!"""
+
+# (A) Text extrahieren
+text = re.search(r'Text:\s*(.*)', post, re.DOTALL).group(1).strip()
+
+# (B) Bereinigung
+text = re.sub(r'@\w+', '', text)           # @Mentions
+text = re.sub(r'#\w+', '', text)           # Hashtags
+text = re.sub(r'https?://\S+', '', text)   # URLs
+text = re.sub(r'&uuml;', 'ü', text)        # HTML-Entities
+text = re.sub(r'&amp;', '&', text)
+text = re.sub(r'[^\w\sÄÖÜäöüß]', '', text) # Sonderzeichen
+text = re.sub(r'\s+', ' ', text).strip()   # Mehrfachleerzeichen
+
+# Tippfehler
+tippfehler = {'nich': 'nicht', 'wierklich': 'wirklich', 'verpakung': 'Verpackung'}
+for falsch, richtig in tippfehler.items():
+    text = re.sub(r'\b' + falsch + r'\b', richtig, text, flags=re.I)</code></pre>
+  </div>
+</div>
+
+</div>
+
+<div id="m4-flash" style="display:none">
+  <div class="info">Karte anklicken zum Umdrehen.</div>
+  <div class="fc-grid" id="m4fcGrid"></div>
+  <div class="fc-hint">Klicken = umdrehen</div>
+</div>
+
+<div id="m4-quiz" style="display:none">
+  <div class="quiz-wrap" id="m4QuizWrap"></div>
+</div>
+
+<div id="m4-transfer" style="display:none">
+  <div class="transfer-box">
+    <div class="transfer-label">🚀 Transferfrage — Modul 4</div>
+    <div class="transfer-q">Du bekommst Weblogs im Format:
+"2025-01-12 14:23:01 ERROR user@example.com Login failed from IP 192.168.1.5"
+"2025-01-12 14:23:45 INFO  admin@test.at Session started"
+
+▶ Schreibe einen Regex-Ausdruck (Pseudocode OK) um: (a) alle E-Mail-Adressen zu extrahieren, (b) alle IP-Adressen zu extrahieren, (c) nur ERROR-Zeilen zu finden.
+▶ Welche Funktion aus dem re-Modul nutzt du für (a), welche für (c)?
+▶ Du willst das Pattern über 1 Million Logs anwenden. Was nutzt du für Performance?
+▶ Was ist [^\w\s] und was entfernt dieser Ausdruck?</div>
+    <textarea class="transfer-ta" id="m4ta" placeholder="Schreibe deine Antwort hier..."></textarea>
+    <div class="transfer-actions">
+      <button class="btn btn-yellow" onclick="m4_showModel()">💡 Musterlösung</button>
+      <span id="doneBadge_4"></span>
+      <button class="btn btn-green" id="unlockBtn_4" onclick="DAN.completeModule(4)">🔓 Abschließen & Modul 5 freischalten</button>
+    </div>
+    <div class="model-answer" id="m4model">
+      <div class="model-label">Musterlösung:</div>
+      <strong>(a) E-Mail-Adressen extrahieren:</strong><br>
+      <code>re.findall(r'[\w.+-]+@[\w-]+\.[a-z]{2,}', log_line, re.I)</code><br><br>
+      <strong>(b) IP-Adressen extrahieren:</strong><br>
+      <code>re.findall(r'\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b', log_line)</code><br><br>
+      <strong>(c) Nur ERROR-Zeilen:</strong><br>
+      <code>re.search(r'\bERROR\b', log_line)</code> — gibt Match-Objekt wenn gefunden, None wenn nicht.<br>
+      Oder: <code>[line for line in logs if re.search(r'\bERROR\b', line)]</code><br><br>
+      <strong>Funktionen:</strong> (a) → <code>re.findall()</code> (gibt Liste aller Matches). (c) → <code>re.search()</code> (gibt erstes Match oder None für Boolean-Check).<br><br>
+      <strong>Performance bei 1 Mio. Logs:</strong> <code>re.compile(pattern)</code> — kompiliert Pattern einmalig, wiederverwendbar ohne Re-Kompilierung.<br>
+      <code>pattern = re.compile(r'[\w.+-]+@[\w-]+\.[a-z]{2,}', re.I)</code><br>
+      Dann: <code>pattern.findall(log_line)</code><br><br>
+      <strong>[^\w\s]:</strong> Zeichenklasse die alles matcht, das WEDER Wortzeichen (\w = Buchstaben, Ziffern, _) NOCH Whitespace (\s) ist → Sonderzeichen, Satzzeichen, Symbole. Nützlich zum Entfernen aller Sonderzeichen bei gleichzeitigem Behalten von Text und Leerzeichen.
+    </div>
+  </div>
+</div>
+
+<script>
+const m4flash = [
+  {q:'Was matcht \\d+?', a:'Eine oder mehr Ziffern (0-9). \\d = digit, + = 1 oder mehr. Bsp: "123" matcht, "" matcht nicht.'},
+  {q:'Unterschied re.search vs re.match?', a:'search() = Match irgendwo im String. match() = Match NUR am Anfang. "abc" → search(r"b") findet, match(r"b") findet nicht.'},
+  {q:'Wie entfernt man alle @-Mentions?', a:'re.sub(r\'@\\w+\', \'\', text) — @ gefolgt von einem oder mehr Wortzeichen.'},
+  {q:'Was bewirkt re.MULTILINE?', a:'^ und $ beziehen sich auf Zeilenanfang/-ende, nicht nur String-Anfang/-Ende. Nötig für mehrzeilige Texte.'},
+  {q:'Was gibt re.findall() zurück?', a:'Liste aller nicht-überlappenden Matches als Strings. Bei Gruppen: Liste von Tupeln.'},
+  {q:'Warum re.compile() verwenden?', a:'Kompiliert Pattern einmalig → wiederverwendbar ohne Re-Kompilierung. Performance-Vorteil bei vielen Anwendungen desselben Patterns.'},
+  {q:'Was ist r"..." in Python?', a:'Raw-String — Backslashes werden nicht interpretiert. r"\\d" = Backslash + d (Regex). "\\d" = würde \\d als Python-Escape interpretieren.'},
+  {q:'Was matcht [^\\w\\s]?', a:'Alles was WEDER Wortzeichen (\\w) NOCH Whitespace (\\s) ist → Sonderzeichen, Satzzeichen, Symbole.'},
+];
+
+const m4quiz = [
+  {q:'Welche Funktion ersetzt alle Muster in einem String?', opts:['re.search()','re.match()','re.sub()','re.findall()'], c:2, exp:'re.sub(pattern, replacement, string) → ersetzt alle Matches, gibt bereinigten String zurück.'},
+  {q:'Was matcht r\'\\s+\'?', opts:['Ein oder mehr Sonderzeichen','Ein oder mehr Whitespace-Zeichen','Nur einen Space','Keine Whitespace'], c:1, exp:'\\s = Whitespace (Space, Tab, Newline). + = 1 oder mehr.'},
+  {q:'Welcher Flag lässt . auch Newlines matchen?', opts:['re.I','re.M','re.S','re.X'], c:2, exp:'re.S (re.DOTALL) = Punkt matcht auch \\n. Nötig für mehrzeilige Matches.'},
+  {q:'r\'@\\w+\' angewendet auf \'@ShopSupport123\' gibt:', opts:['\'@ShopSupport123\'','\'@Shop\'','\'ShopSupport123\'','Kein Match'], c:0, exp:'@ matcht @, \\w+ matcht alle Wort-Zeichen (Buchstaben + Ziffern + _) bis Whitespace.'},
+  {q:'Was ist der Unterschied zwischen re.sub() und re.subn()?', opts:['subn ersetzt nur einmal','subn gibt (String, Anzahl der Ersetzungen) zurück','subn ist schneller','Kein Unterschied'], c:1, exp:'re.subn() gibt Tuple: (neuer_string, anzahl_ersetzungen). Nützlich wenn man wissen will, wie viel geändert wurde.'},
+];
+
+function m4_tab(name, btn) {
+  ['learn','flash','quiz','transfer'].forEach(t => {
+    document.getElementById('m4-'+t).style.display = t===name?'block':'none';
+  });
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (name==='flash') m4_renderFlash();
+  if (name==='quiz') m4_startQuiz();
+}
+function m4_renderFlash() {
+  document.getElementById('m4fcGrid').innerHTML = m4flash.map((c,i) => `
+    <div class="fc" onclick="this.classList.toggle('flipped')">
+      <div class="fc-inner"><div class="fc-front">${c.q}</div><div class="fc-back">${c.a}</div></div>
+    </div>`).join('');
+}
+let m4qi=0, m4ans=false;
+function m4_startQuiz() { m4qi=0; m4ans=false; m4_renderQuiz(); }
+function m4_renderQuiz() {
+  const wrap=document.getElementById('m4QuizWrap');
+  if (m4qi>=m4quiz.length) {
+    wrap.innerHTML=`<div style="text-align:center;padding:40px"><div style="font-size:2.5rem">🎉</div><div style="font-weight:700;margin:10px 0">Fertig!</div>
+      <button class="btn btn-purple" onclick="m4_tab('transfer',document.querySelectorAll('.tab-btn')[3])">→ Transferfrage</button>
+      <button class="btn btn-ghost" style="background:var(--border);color:var(--text);margin-left:8px" onclick="m4_startQuiz()">↺ Nochmal</button></div>`; return;
+  }
+  const q=m4quiz[m4qi];
+  wrap.innerHTML=`<div class="quiz-progress">Frage ${m4qi+1}/${m4quiz.length}</div>
+    <div class="quiz-q">${q.q}</div>
+    <div class="quiz-opts">${q.opts.map((o,i)=>`<button class="opt" id="m4o${i}" onclick="m4_ans(${i},${q.c})">${String.fromCharCode(65+i)}. ${o}</button>`).join('')}</div>
+    <div class="quiz-fb" id="m4fb"></div>
+    <div class="quiz-nav" id="m4nav"><button class="btn btn-purple" onclick="m4qi++;m4ans=false;m4_renderQuiz()">Nächste →</button></div>`;
+}
+function m4_ans(ch,co) {
+  if(m4ans)return; m4ans=true;
+  for(let i=0;i<5;i++){const e=document.getElementById('m4o'+i);if(!e)continue;e.disabled=true;if(i===co)e.classList.add('correct');else if(i===ch)e.classList.add('wrong');}
+  const q=m4quiz[m4qi],fb=document.getElementById('m4fb');
+  fb.classList.add('show',ch===co?'ok':'bad');
+  fb.innerHTML=(ch===co?'✓ Richtig! ':'✗ Falsch. ')+(q.exp||'');
+  document.getElementById('m4nav').classList.add('show');
+}
+function m4_showModel() { document.getElementById('m4model').classList.toggle('show'); }
+(function(){
+  if(window.DAN&&DAN.isDone(4)){
+    const b=document.getElementById('doneBadge_4');if(b)b.innerHTML='<span class="done-badge">✅ Abgeschlossen!</span>';
+    const u=document.getElementById('unlockBtn_4');if(u)u.style.display='none';
+  }
+})();
+</script>

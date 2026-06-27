@@ -1,0 +1,355 @@
+<div class="mod-tag">Modul 1</div>
+<div class="mod-title">Grundlagen: Daten & Qualität</div>
+<div class="mod-sub">Wissenstreppe · Skalenniveaus · 8 Dirty-Data-Typen · 5 C's Qualität · Ethik · Data Life Cycle</div>
+
+<div class="mode-tabs">
+  <button class="tab-btn active" onclick="m1_tab('learn',this)">📖 Lernen</button>
+  <button class="tab-btn" onclick="m1_tab('flash',this)">🃏 Flashcards</button>
+  <button class="tab-btn" onclick="m1_tab('quiz',this)">🎯 Quiz</button>
+  <button class="tab-btn" onclick="m1_tab('transfer',this)">🚀 Transferfrage</button>
+</div>
+
+<!-- LEARN -->
+<div id="m1-learn">
+
+<div class="concept open" id="m1c0">
+  <div class="concept-hdr" onclick="toggleC('m1c0')">
+    <div class="concept-name">Wissenstreppe nach North</div>
+    <div class="concept-arrow">▼</div>
+  </div>
+  <div class="concept-body">
+    <div class="raster">
+      <div class="r was"><div class="r-label">🔵 Was ist das?</div><div class="r-body">
+        Stufenmodell: wie aus rohen Symbolen Expertise wird.<br><br>
+        <table>
+          <tr><th>Stufe</th><th>+ Zuwachs</th></tr>
+          <tr><td><strong>Symbole</strong></td><td>Ausgangspunkt</td></tr>
+          <tr><td><strong>Daten</strong></td><td>+ Syntax (Struktur)</td></tr>
+          <tr><td><strong>Information</strong></td><td>+ Bedeutung/Kontext</td></tr>
+          <tr><td><strong>Wissen</strong></td><td>+ Vernetzung</td></tr>
+          <tr><td><strong>Handeln</strong></td><td>+ Motivation</td></tr>
+          <tr><td><strong>Kompetenz</strong></td><td>+ Erfahrung</td></tr>
+          <tr><td><strong>Expertise</strong></td><td>+ Tiefe/Jahre</td></tr>
+        </table>
+      </div></div>
+      <div class="r wann"><div class="r-label">🟢 Wann & Warum?</div><div class="r-body">
+        Begründet, warum Datenbereinigung wichtig ist: Schlechte Daten blockieren den Aufstieg bereits auf Stufe 2 (Daten). Kein sauberes Fundament = kein Wissen, keine Handlungsfähigkeit.<br><br>
+        Prüfungsfrage: "Warum ist Data Cleaning wichtig?" → Wissenstreppe!
+      </div></div>
+      <div class="r nicht"><div class="r-label">🟠 Wann NICHT?</div><div class="r-body">
+        Nicht als technisches Implementierungsmodell verstehen — die Treppe ist konzeptuell. Eine Datenbank speichert keine "Information", sondern Daten. Der Kontext entsteht erst beim Nutzer.
+      </div></div>
+      <div class="r esel"><div class="r-label">🟣 Eselsbrücke</div><div class="r-body">
+        <strong>"Sei Daten-Info-Wis-Han-Kom-Ex"</strong><br>
+        Symbole → Daten → Information → Wissen → Handeln → Kompetenz → Expertise.<br>
+        Stell dir vor: du trägst einen Datensack eine Treppe hoch und wirst bei jeder Stufe klüger.
+      </div></div>
+    </div>
+  </div>
+</div>
+
+<div class="concept" id="m1c1">
+  <div class="concept-hdr" onclick="toggleC('m1c1')">
+    <div class="concept-name">Skalenniveaus (4 Stufen)</div>
+    <div class="concept-arrow">▼</div>
+  </div>
+  <div class="concept-body">
+    <div class="raster">
+      <div class="r was"><div class="r-label">🔵 Was ist das?</div><div class="r-body">
+        Bestimmen, welche mathematischen Operationen auf Variablen erlaubt sind:<br><br>
+        <table>
+          <tr><th>Skala</th><th>Eigenschaft</th><th>Beispiel</th><th>Erlaubt</th></tr>
+          <tr><td><strong>Nominal</strong></td><td>nur Kategorien</td><td>Geschlecht, Farbe</td><td>=, ≠</td></tr>
+          <tr><td><strong>Ordinal</strong></td><td>+ Reihenfolge</td><td>Schulnoten, Likert</td><td>&lt;, &gt;</td></tr>
+          <tr><td><strong>Intervall</strong></td><td>+ gleiche Abstände</td><td>Temperatur °C</td><td>+, −</td></tr>
+          <tr><td><strong>Verhältnis</strong></td><td>+ echter Nullpunkt</td><td>Gewicht, Alter</td><td>×, ÷</td></tr>
+        </table>
+        <div class="info" style="margin-top:8px">Jede Stufe darf alles der vorigen PLUS eine Sache mehr.</div>
+      </div></div>
+      <div class="r wann"><div class="r-label">🟢 Wann & Warum?</div><div class="r-body">
+        Vor jeder statistischen Analyse: bestimmt welche Statistik erlaubt ist.<br>
+        <strong>Mittelwert</strong> nur ab Intervall!<br>
+        <strong>Likert-Items</strong> sind ordinal → Mittelwert streng genommen unzulässig (aber in der Praxis oft verwendet, wenn Skala groß genug).<br>
+        Auch relevant für: Imputation (was als Ersatzwert sinnvoll ist), Visualisierung.
+      </div></div>
+      <div class="r nicht"><div class="r-label">🟠 Wann NICHT?</div><div class="r-body">
+        <strong>Nie Mittelwert bei Nominaldaten</strong> ("Durchschnittsgeschlecht" ist sinnlos).<br>
+        Ordinalabstände NICHT als gleich annehmen: Note 1→2 ist nicht notwendig gleich wie 2→3.<br>
+        0°C bedeutet NICHT "keine Wärme" → kein Verhältnisniveau!
+      </div></div>
+      <div class="r esel"><div class="r-label">🟣 Eselsbrücke</div><div class="r-body">
+        <strong>N-O-I-V: "Nicht Ohne Ihre Vagheit"</strong><br>
+        Nominal → Ordinal → Intervall → Verhältnis.<br><br>
+        Thermometer 0°C = Intervall (kein echter Null). Gewicht 0 kg = Verhältnis (echter Null).
+      </div></div>
+    </div>
+  </div>
+</div>
+
+<div class="concept" id="m1c2">
+  <div class="concept-hdr" onclick="toggleC('m1c2')">
+    <div class="concept-name">8 Typen Dirty Data</div>
+    <div class="concept-arrow">▼</div>
+  </div>
+  <div class="concept-body">
+    <div class="raster">
+      <div class="r was"><div class="r-label">🔵 Was ist das?</div><div class="r-body">
+        <table>
+          <tr><th>Typ</th><th>Problem</th><th>Beispiel</th></tr>
+          <tr><td><strong>Duplicate</strong></td><td>doppelte Einträge</td><td>Kunde 2× angelegt</td></tr>
+          <tr><td><strong>Incorrect</strong></td><td>falsche Werte/Tippfehler</td><td>Geburtsjahr 1899</td></tr>
+          <tr><td><strong>Inconsistent</strong></td><td>verschiedene Formate</td><td>DD.MM.YYYY vs YYYY-MM-DD</td></tr>
+          <tr><td><strong>Incomplete</strong></td><td>fehlende Felder</td><td>E-Mail leer</td></tr>
+          <tr><td><strong>Inaccurate</strong></td><td>ungenaue Werte</td><td>"ca. 100 km"</td></tr>
+          <tr><td><strong>Outdated</strong></td><td>veraltete Daten</td><td>alte Adresse</td></tr>
+          <tr><td><strong>Insecure</strong></td><td>fehlendes Zugriffsmanagement</td><td>Passwort im Klartext</td></tr>
+          <tr><td><strong>Hoarded</strong></td><td>sinnlos gesammelt</td><td>Daten ohne Zweck</td></tr>
+        </table>
+      </div></div>
+      <div class="r wann"><div class="r-label">🟢 Wann & Warum?</div><div class="r-body">
+        Datenprüfung vor jeder Analyse. Im CPlus-Datensatz z.B.:<br>
+        <ul>
+          <li><strong>Incorrect:</strong> IP14 hatte -77 als Missing-Code (nicht erkannt)</li>
+          <li><strong>Inconsistent:</strong> IP13 hatte Skala 1-5, aber 6er-Werte eingetragen</li>
+          <li><strong>Hoarded:</strong> Spalten "Unnamed: 15/16" waren komplett leer</li>
+        </ul>
+      </div></div>
+      <div class="r nicht"><div class="r-label">🟠 Wann NICHT?</div><div class="r-body">
+        Typen überlappen — ein veralteter Wert ist oft gleichzeitig inaccurate. Nicht als erschöpfende, trennscharf-disjunkte Liste sehen.
+      </div></div>
+      <div class="r esel"><div class="r-label">🟣 Eselsbrücke</div><div class="r-body">
+        <strong>"Du-In-Co-In-In-Ou-In-Ho"</strong><br>
+        <strong>D</strong>uplicate, <strong>I</strong>ncorrect, <strong>C</strong>onsistent, <strong>I</strong>ncomplete, <strong>I</strong>naccurate, <strong>O</strong>utdated, <strong>I</strong>nsecure, <strong>H</strong>oarded.<br><br>
+        Merkregel: "DICOIIIOH" — klingt wie ein Niesen.
+      </div></div>
+    </div>
+  </div>
+</div>
+
+<div class="concept" id="m1c3">
+  <div class="concept-hdr" onclick="toggleC('m1c3')">
+    <div class="concept-name">5 C's of Data Quality</div>
+    <div class="concept-arrow">▼</div>
+  </div>
+  <div class="concept-body">
+    <div class="raster">
+      <div class="r was"><div class="r-label">🔵 Was ist das?</div><div class="r-body">
+        <table>
+          <tr><th>C</th><th>Bedeutung</th><th>Verletzt wenn…</th></tr>
+          <tr><td><strong>Clean</strong></td><td>keine fehlenden/falschen Werte</td><td>NaN, Tippfehler</td></tr>
+          <tr><td><strong>Consistent</strong></td><td>gleiche Bedeutung überall</td><td>unterschiedl. Formate</td></tr>
+          <tr><td><strong>Conformed</strong></td><td>klare Einheiten & Grenzen</td><td>km vs. Meilen</td></tr>
+          <tr><td><strong>Current</strong></td><td>zeitgemäß</td><td>veraltete Adressen</td></tr>
+          <tr><td><strong>Complete</strong></td><td>Breite & Tiefe vorhanden</td><td>fehlende Spalten</td></tr>
+        </table>
+      </div></div>
+      <div class="r wann"><div class="r-label">🟢 Wann & Warum?</div><div class="r-body">
+        Checkliste nach Datenerhebung. Im Air-Quality-Datensatz:<br>
+        <ul>
+          <li>CO-Spalte war String statt float → nicht <em>Clean</em></li>
+          <li>Komma statt Punkt als Dezimaltrenner → nicht <em>Consistent</em></li>
+          <li>-200 als Missing-Code → nicht <em>Conformed</em></li>
+        </ul>
+      </div></div>
+      <div class="r nicht"><div class="r-label">🟠 Wann NICHT?</div><div class="r-body">
+        <strong>Nicht mit den 5 C's der Ethik verwechseln!</strong> (andere Domäne, gleiche Anzahl C's — Prüfungsfalle!)<br>
+        Daten können alle 5 C's erfüllen und trotzdem ethisch problematisch sein.
+      </div></div>
+      <div class="r esel"><div class="r-label">🟣 Eselsbrücke</div><div class="r-body">
+        <strong>Pizza-Test:</strong> Gute Pizza muss SAUBER (Clean) sein, überall GLEICH (Consistent) schmecken, in GENORMTER Größe (Conformed) kommen, FRISCH (Current) sein, VOLLSTÄNDIG belegt (Complete) sein.
+      </div></div>
+    </div>
+  </div>
+</div>
+
+<div class="concept" id="m1c4">
+  <div class="concept-hdr" onclick="toggleC('m1c4')">
+    <div class="concept-name">5 C's der Ethik & Data Life Cycle</div>
+    <div class="concept-arrow">▼</div>
+  </div>
+  <div class="concept-body">
+    <div class="raster">
+      <div class="r was"><div class="r-label">🔵 Was ist das?</div><div class="r-body">
+        <strong>Ethische 5 C's:</strong>
+        <ul>
+          <li><strong>Consent</strong> — Einwilligung</li>
+          <li><strong>Clarity</strong> — klare Kommunikation über Nutzung</li>
+          <li><strong>Consistency</strong> — konsistente Regelanwendung</li>
+          <li><strong>Control & Transparency</strong> — Betroffene haben Kontrolle</li>
+          <li><strong>Consequences & Harm</strong> — Schaden vermeiden</li>
+        </ul>
+        <hr>
+        <strong>Data Life Cycle (Mahanti 2019):</strong><br>
+        Creation → Processing → Storage → Access → Archive → Purge
+      </div></div>
+      <div class="r wann"><div class="r-label">🟢 Wann & Warum?</div><div class="r-body">
+        Ethik: bei jedem Projekt mit personenbezogenen Daten. DSGVO, KI-Systeme.<br><br>
+        Life Cycle: erklärt WANN Dirty Data entsteht (in jeder Phase möglich!) und WO im Prozess bereinigt werden muss.
+      </div></div>
+      <div class="r nicht"><div class="r-label">🟠 Wann NICHT?</div><div class="r-body">
+        Life Cycle ist kein starres Modell — Phasen können iterieren. Daten können reaktiviert werden (Archive → Access).<br><br>
+        Ethik gilt auch bei öffentlichen Daten (Re-Identifikationsrisiko!).
+      </div></div>
+      <div class="r esel"><div class="r-label">🟣 Eselsbrücke</div><div class="r-body">
+        <strong>Life Cycle:</strong> "Crazy Parrots Sleep And Part" → Creation, Processing, Storage, Access, (Archive), Purge.<br><br>
+        <strong>Ethik-C's:</strong> Frag dich: "Darf ich das?" (Consent) → "Weiß die Person?" (Clarity) → "Ist es fair?" (Consistency) → "Hat sie Kontrolle?" (Control) → "Schadet es?" (Consequences).
+      </div></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- end learn -->
+
+<!-- FLASHCARDS -->
+<div id="m1-flash" style="display:none">
+  <div class="info">Karte anklicken zum Umdrehen. Vorderseite = Frage, Rückseite = Antwort.</div>
+  <div class="fc-grid" id="m1fcGrid"></div>
+  <div class="fc-hint">Klicken = umdrehen</div>
+</div>
+
+<!-- QUIZ -->
+<div id="m1-quiz" style="display:none">
+  <div class="quiz-wrap" id="m1QuizWrap"></div>
+</div>
+
+<!-- TRANSFER -->
+<div id="m1-transfer" style="display:none">
+  <div class="transfer-box">
+    <div class="transfer-label">🚀 Transferfrage — Modul 1</div>
+    <div class="transfer-q">Du analysierst Kundendaten aus 5 Systemen (3 Jahre gesammelt). Du findest:
+- Manche Kunden sind dreifach angelegt
+- Geburtsdaten teils als DD.MM.YYYY, teils als YYYY-MM-DD
+- 12% der E-Mail-Felder sind leer
+- Spalte "FirmSize" enthält den Wert -66 (laut Datenwörterbuch: Missing-Code)
+
+▶ Welche Dirty-Data-Typen und verletzten 5 C's (Qualität) liegen vor?
+▶ FirmSize wird als Verhältnisvariable behandelt. Ist das korrekt? Begründe anhand der Skalenniveaus.
+▶ Warum sollte man -66 NICHT einfach als 0 lassen, sondern als np.nan kodieren?</div>
+    <textarea class="transfer-ta" id="m1ta" placeholder="Schreibe deine Antwort hier..."></textarea>
+    <div class="transfer-actions">
+      <button class="btn btn-yellow" onclick="m1_showModel()">💡 Musterlösung</button>
+      <span id="doneBadge_1">${window.DAN && DAN.isDone(1) ? '<span class="done-badge">✅ Modul abgeschlossen!</span>' : ''}</span>
+      <button class="btn btn-green" id="unlockBtn_1" onclick="DAN.completeModule(1)" style="${window.DAN && DAN.isDone(1) ? 'display:none' : ''}">🔓 Abschließen & Modul 2 freischalten</button>
+    </div>
+    <div class="model-answer" id="m1model">
+      <div class="model-label">Musterlösung:</div>
+      <strong>Dirty-Data-Typen:</strong> Duplicate (3× angelegt), Inconsistent (Datumsformate), Incomplete (E-Mail leer), Incorrect (-66 als numerischer Wert statt NA-Marker).<br><br>
+      <strong>5 C's verletzt:</strong> Clean (fehlende E-Mails, -66-Werte), Consistent (Datumsformate), Complete (fehlende Felder).<br><br>
+      <strong>Skalenniveau FirmSize:</strong> Ja, Verhältnisskala korrekt — Firmengröße (Mitarbeiterzahl) hat echten Nullpunkt (0 MA = keine Mitarbeiter), Abstände sind gleich, Division sinnvoll (doppelt so groß).<br><br>
+      <strong>Warum -66 → np.nan statt 0:</strong> -66 ist kein echter Messwert. Als 0 belassen würde die Statistik verzerren (Mittelwert, Varianz). Viele Analysen und Visualisierungen ignorieren NaN automatisch. Als 0 würden -66 als "keine Mitarbeiter" interpretiert — inhaltlich falsch und statistisch verheerend. Im echten CPlus-Datensatz: <code>df["CD4"] = df["CD4"].replace(-66, np.nan)</code>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── M1 DATA ──
+const m1flash = [
+  {q:'Was ist der Unterschied zwischen Daten und Information?', a:'Daten = Symbole + Syntax (keine Bedeutung). Information = Daten + Kontext/Bedeutung.'},
+  {q:'Nenne die 8 Typen Dirty Data.', a:'Duplicate, Incorrect, Inconsistent, Incomplete, Inaccurate, Outdated, Insecure, Hoarded'},
+  {q:'Welches Skalenniveau hat Temperatur in °C?', a:'Intervall — gleiche Abstände, ABER kein echter Nullpunkt (0°C ≠ keine Wärme). Deshalb kein Verhältnisniveau.'},
+  {q:'Welches Skalenniveau erlaubt Division?', a:'Verhältnisskala — hat echten Nullpunkt. Bsp.: 60 kg ist doppelt so schwer wie 30 kg.'},
+  {q:'Was bedeutet "Conformed" bei den 5 C\'s?', a:'Klare, einheitliche Einheiten und Grenzen — z.B. alle Distanzen in km, nicht km und Meilen gemischt.'},
+  {q:'Nenne die Phasen des Data Life Cycle.', a:'Creation → Processing → Storage → Access → Archive → Purge'},
+  {q:'Was ist "Hoarded Data"?', a:'Daten ohne klaren Verwendungszweck gesammelt. Erhöht Speicher, Compliance-Risiko und Rauschen.'},
+  {q:'5 C\'s Ethik — welches C steht für Einwilligung?', a:'Consent — Betroffene müssen der Datennutzung zustimmen.'},
+  {q:'Warum ist Mittelwert bei Ordinalskala problematisch?', a:'Ordinalabstände sind nicht gleich groß. Note 1→2 muss nicht dieselbe "Schrittgröße" sein wie 2→3.'},
+  {q:'Was unterscheidet Inkonsistent von Incorrect?', a:'Inconsistent = gleiche Info in verschiedenen Formaten (DD.MM. vs YYYY-MM-DD). Incorrect = inhaltlich falsch (Geburtsjahr 1899 für junge Person).'},
+];
+
+const m1quiz = [
+  {q:'Eine Datenbank enthält Geburtsdaten als "01.01.1990" und "1990-01-01". Welcher Dirty-Data-Typ?', opts:['Incorrect','Inconsistent','Duplicate','Outdated'], c:1, exp:'Inconsistent = gleiche Information in verschiedenen Formaten.'},
+  {q:'Temperatur in °C ist welches Skalenniveau?', opts:['Nominal','Ordinal','Intervall','Verhältnis'], c:2, exp:'Kein echter Nullpunkt (0°C = nicht "keine Wärme") → Intervall, nicht Verhältnis.'},
+  {q:'Welches C der 5 C\'s (Qualität) bedeutet zeitgemäße Daten?', opts:['Clean','Consistent','Current','Complete'], c:2, exp:'Current = Daten müssen aktuell sein, z.B. keine veralteten Adressen.'},
+  {q:'Auf welcher Stufe der Wissenstreppe entsteht Wissen?', opts:['Durch Hinzufügen von Syntax','Durch Vernetzung von Information','Durch Motivation zum Handeln','Durch jahrelange Erfahrung'], c:1, exp:'Information + Vernetzung = Wissen. Information entsteht durch Bedeutung/Kontext.'},
+  {q:'Was passiert statistisch wenn man einen Missing-Code (-66) stehen lässt?', opts:['Gar nichts, Python ignoriert das','Mittelwert und Varianz werden stark verzerrt','Nur Median ist betroffen','Nur bei Nominalskala ein Problem'], c:1, exp:'-66 wird als echter Wert gewertet → verfälscht alle deskriptiven Statistiken massiv.'},
+  {q:'Welches Skalenniveau haben Schulnoten (1-5)?', opts:['Nominal','Ordinal','Intervall','Verhältnis'], c:1, exp:'Reihenfolge klar (1 besser als 5), aber Abstände nicht gleich groß → Ordinal.'},
+];
+
+// ── M1 TABS ──
+function m1_tab(name, btn) {
+  ['learn','flash','quiz','transfer'].forEach(t => {
+    document.getElementById('m1-'+t).style.display = t===name?'block':'none';
+  });
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (name==='flash') m1_renderFlash();
+  if (name==='quiz') m1_startQuiz();
+}
+
+// ── FLASHCARDS ──
+function m1_renderFlash() {
+  const g = document.getElementById('m1fcGrid');
+  g.innerHTML = m1flash.map((c,i) => `
+    <div class="fc" id="m1fc${i}" onclick="this.classList.toggle('flipped')">
+      <div class="fc-inner">
+        <div class="fc-front">${c.q}</div>
+        <div class="fc-back">${c.a}</div>
+      </div>
+    </div>`).join('');
+}
+
+// ── QUIZ ──
+let m1qi = 0, m1answered = false;
+function m1_startQuiz() { m1qi = 0; m1answered = false; m1_renderQuiz(); }
+function m1_renderQuiz() {
+  const wrap = document.getElementById('m1QuizWrap');
+  if (m1qi >= m1quiz.length) {
+    wrap.innerHTML = `<div style="text-align:center;padding:40px">
+      <div style="font-size:2.5rem">🎉</div>
+      <div style="font-weight:700;font-size:1.1rem;margin:10px 0">Quiz abgeschlossen!</div>
+      <p style="color:var(--muted)">Weiter zur Transferfrage?</p>
+      <button class="btn btn-purple" style="margin-top:10px" onclick="m1_tab('transfer',document.querySelectorAll('.tab-btn')[3])">→ Transferfrage</button>
+      <button class="btn btn-ghost" style="background:var(--border);color:var(--text);margin-top:10px;margin-left:8px" onclick="m1_startQuiz()">↺ Wiederholen</button>
+    </div>`; return;
+  }
+  const q = m1quiz[m1qi];
+  wrap.innerHTML = `
+    <div class="quiz-progress">Frage ${m1qi+1} / ${m1quiz.length}</div>
+    <div class="quiz-q">${q.q}</div>
+    <div class="quiz-opts">
+      ${q.opts.map((o,i)=>`<button class="opt" id="m1opt${i}" onclick="m1_answer(${i},${q.c})">${String.fromCharCode(65+i)}. ${o}</button>`).join('')}
+    </div>
+    <div class="quiz-fb" id="m1fb"></div>
+    <div class="quiz-nav" id="m1nav">
+      <button class="btn btn-purple" onclick="m1qi++;m1answered=false;m1_renderQuiz()">Nächste →</button>
+    </div>`;
+}
+function m1_answer(chosen, correct) {
+  if (m1answered) return;
+  m1answered = true;
+  for (let i=0;i<4;i++) {
+    const el = document.getElementById('m1opt'+i);
+    if (!el) continue;
+    el.disabled = true;
+    if (i===correct) el.classList.add('correct');
+    else if (i===chosen) el.classList.add('wrong');
+  }
+  const fb = document.getElementById('m1fb');
+  const q = m1quiz[m1qi];
+  fb.classList.add('show', chosen===correct?'ok':'bad');
+  fb.innerHTML = (chosen===correct?'✓ Richtig! ':'✗ Falsch. ') + (q.exp||'');
+  document.getElementById('m1nav').classList.add('show');
+}
+
+// ── TRANSFER ──
+function m1_showModel() {
+  document.getElementById('m1model').classList.toggle('show');
+}
+
+// ── HELPERS ──
+function toggleC(id) {
+  document.getElementById(id).classList.toggle('open');
+}
+
+// init badges
+(function(){
+  if (window.DAN) {
+    if (DAN.isDone(1)) {
+      const b = document.getElementById('doneBadge_1');
+      if (b) b.innerHTML = '<span class="done-badge">✅ Modul abgeschlossen!</span>';
+      const u = document.getElementById('unlockBtn_1');
+      if (u) u.style.display = 'none';
+    }
+  }
+})();
+</script>

@@ -1,0 +1,404 @@
+<div class="mod-tag">Modul 6</div>
+<div class="mod-title">Missing Values, OLS-Regression & Datensätze</div>
+<div class="mod-sub">MCAR/MAR/MNAR · missingno · VIF · Heteroskedastizität · Air Quality · NYC Taxi</div>
+
+<div class="mode-tabs">
+  <button class="tab-btn active" onclick="m6_tab('learn',this)">📖 Lernen</button>
+  <button class="tab-btn" onclick="m6_tab('flash',this)">🃏 Flashcards</button>
+  <button class="tab-btn" onclick="m6_tab('quiz',this)">🎯 Quiz</button>
+  <button class="tab-btn" onclick="m6_tab('transfer',this)">🚀 Transferfrage</button>
+</div>
+
+<div id="m6-learn">
+
+<div class="concept open" id="m6c0">
+  <div class="concept-hdr" onclick="toggleC('m6c0')">
+    <div class="concept-name">Missing Values — MCAR / MAR / MNAR</div>
+    <div class="concept-arrow">▼</div>
+  </div>
+  <div class="concept-body">
+    <div class="raster">
+      <div class="r was"><div class="r-label">🔵 Was ist das?</div><div class="r-body">
+        Drei Mechanismen warum Daten fehlen:
+        <table>
+          <tr><th>Typ</th><th>Vollname</th><th>Bedeutung</th><th>Beispiel</th></tr>
+          <tr><td><strong>MCAR</strong></td><td>Missing Completely At Random</td><td>Fehlen zufällig, unabhängig von allen Variablen</td><td>Serverausfall löscht zufällige Zeilen</td></tr>
+          <tr><td><strong>MAR</strong></td><td>Missing At Random</td><td>Fehlen hängt von anderen Variablen ab (nicht vom fehlenden Wert selbst)</td><td>Ältere Befragte überspringen Frage (Alter bekannt)</td></tr>
+          <tr><td><strong>MNAR</strong></td><td>Missing Not At Random</td><td>Fehlen hängt vom fehlenden Wert selbst ab</td><td>Hochverdiener lassen Einkommensfeld leer</td></tr>
+        </table>
+        <br>
+        <strong>Detektion:</strong>
+        <pre><code>import missingno as msno
+import pandas as pd
+
+df.isnull().sum()          # Anzahl NaN pro Spalte
+df.isnull().mean() * 100   # Prozent fehlend
+
+msno.bar(df)               # Balkendiagramm der Vollständigkeit
+msno.matrix(df)            # Matrix-Visualisierung (Muster sichtbar)
+msno.heatmap(df)           # Korrelation des Fehlens zwischen Variablen
+msno.dendrogram(df)        # Ähnlichkeit der Missing-Patterns</code></pre>
+      </div></div>
+      <div class="r wann"><div class="r-label">🟢 Wann & Warum?</div><div class="r-body">
+        MCAR → Listwise Deletion akzeptabel (zufällig fehlend, kein Bias).<br>
+        MAR → Multiple Imputation empfohlen.<br>
+        MNAR → schwierig! Modell des Fehlmechanismus nötig.<br><br>
+        <strong>missingno Visualisierungen:</strong>
+        <ul>
+          <li><code>msno.bar()</code>: zeigt wie viele gültige Werte pro Spalte</li>
+          <li><code>msno.matrix()</code>: zeigt Muster (gleiche Zeilen immer fehlend?)</li>
+          <li><code>msno.heatmap()</code>: korrelieren fehlende Werte zweier Spalten? (MAR-Hinweis)</li>
+          <li><code>msno.dendrogram()</code>: welche Spalten haben ähnliches Fehlmuster?</li>
+        </ul>
+        <strong>Air Quality Dataset (Notebook):</strong><br>
+        Fehlende Werte codiert als -200 (nicht NaN!):
+        <pre><code>df['CO(GT)'].replace(-200, np.nan, inplace=True)
+# Komma-Dezimaltrennzeichen Problem:
+df['CO(GT)'] = df['CO(GT)'].str.replace(',', '.').astype(float)</code></pre>
+      </div></div>
+      <div class="r nicht"><div class="r-label">🟠 Wann NICHT?</div><div class="r-body">
+        Listwise Deletion bei MNAR → biased! Systematisch bestimmte Personen eliminiert.<br><br>
+        Nie annehmen dass Daten MCAR sind ohne Prüfung. Immer visualisieren (missingno)!<br><br>
+        Mean Imputation bei zeitabhängigen Daten → Zeitreihenstruktur zerstört.
+      </div></div>
+      <div class="r esel"><div class="r-label">🟣 Eselsbrücke</div><div class="r-body">
+        <strong>MCAR</strong>: "Zufall — Chance" (komplett zufällig)<br>
+        <strong>MAR</strong>: "Maybe Andere Ursache" (andere Variable schuld)<br>
+        <strong>MNAR</strong>: "Nobody Admits Reality" (fehlender Wert selbst schuld)<br><br>
+        missingno: <strong>Bar, Matrix, Heatmap, Dendro</strong> = "BMW hat Dendro"
+      </div></div>
+    </div>
+
+    <h3>Strategien: Löschen vs. Imputation</h3>
+    <table>
+      <tr><th>Methode</th><th>Beschreibung</th><th>Wann?</th><th>Problem</th></tr>
+      <tr><td>Listwise Deletion</td><td>Zeile mit einem NaN löschen</td><td>MCAR, wenig fehlend</td><td>Datenverlust</td></tr>
+      <tr><td>Pairwise Deletion</td><td>nur für verfügbare Paare berechnen</td><td>Korrelationsmatrizen</td><td>inkonsistente n</td></tr>
+      <tr><td>Mean/Median Imputation</td><td>durch Mittelwert ersetzen</td><td>schnell, MCAR</td><td>Varianz unterschätzt</td></tr>
+      <tr><td>Multiple Imputation (MI)</td><td>mehrere Datensätze, Ergebnisse pooling</td><td>MAR, empfohlen</td><td>komplex</td></tr>
+      <tr><td>KNN Imputation</td><td>k ähnlichste Beobachtungen</td><td>MAR, numerisch</td><td>rechenintensiv</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="concept" id="m6c1">
+  <div class="concept-hdr" onclick="toggleC('m6c1')">
+    <div class="concept-name">OLS-Regression — Output lesen & interpretieren</div>
+    <div class="concept-arrow">▼</div>
+  </div>
+  <div class="concept-body">
+    <div class="raster">
+      <div class="r was"><div class="r-label">🔵 Was ist das?</div><div class="r-body">
+        Ordinary Least Squares — minimiert Summe der quadrierten Residuen.<br><br>
+        <strong>OLS Output (statsmodels) — wichtige Kennzahlen:</strong>
+        <table>
+          <tr><th>Kennzahl</th><th>Bedeutung</th><th>Faustregel</th></tr>
+          <tr><td><strong>R²</strong></td><td>Varianzaufklärung (0–1)</td><td>höher = besser (kontextabhängig)</td></tr>
+          <tr><td><strong>Adj. R²</strong></td><td>R² korrigiert für Anzahl Prädiktoren</td><td>steigt nur wenn Variable nützt</td></tr>
+          <tr><td><strong>F-Statistik</strong></td><td>Gesamtmodell signifikant?</td><td>p &lt; .05</td></tr>
+          <tr><td><strong>Omnibus</strong></td><td>Test auf Normalität der Residuen</td><td>p > .05 = Normalverteilung OK</td></tr>
+          <tr><td><strong>Jarque-Bera</strong></td><td>Normalität (Skewness + Kurtosis)</td><td>p > .05 = OK</td></tr>
+          <tr><td><strong>Durbin-Watson</strong></td><td>Autokorrelation der Residuen</td><td>≈ 2 = keine Autokorr.</td></tr>
+          <tr><td><strong>Cond. No.</strong></td><td>Multikollinearität</td><td>> 30 = problematisch</td></tr>
+        </table>
+        <pre><code>import statsmodels.api as sm
+X = sm.add_constant(df[['x1','x2','x3']])
+model = sm.OLS(df['y'], X).fit()
+print(model.summary())</code></pre>
+      </div></div>
+      <div class="r wann"><div class="r-label">🟢 Wann & Warum?</div><div class="r-body">
+        R² = Güte des Gesamtmodells. Adj. R² für Vergleich verschiedener Modelle (verhindert Overfitting durch mehr Variablen).<br><br>
+        F-Test: ist das Modell überhaupt besser als der Mittelwert? (H0: alle Koeffizienten = 0)<br><br>
+        Durbin-Watson: bei Zeitreihendaten kritisch (Autokorrelation verletzt OLS-Annahmen).
+      </div></div>
+      <div class="r nicht"><div class="r-label">🟠 Wann NICHT?</div><div class="r-body">
+        R² nicht als einziges Gütekriterium verwenden! Hoher R² kann bei Overfitting entstehen.<br><br>
+        OLS ohne Prüfung der Annahmen: Normalität, Homoskedastizität, keine Multikollinearität!
+      </div></div>
+      <div class="r esel"><div class="r-label">🟣 Eselsbrücke</div><div class="r-body">
+        <strong>R² = "Wieviel erklärt?"</strong><br>
+        <strong>Adj. R² = "Und verdient erklärt?"</strong> (bestraft Extra-Variablen)<br><br>
+        Durbin-Watson ≈ 2 = perfekt. 0 = positive Autokorr. 4 = negative Autokorr.
+      </div></div>
+    </div>
+  </div>
+</div>
+
+<div class="concept" id="m6c2">
+  <div class="concept-hdr" onclick="toggleC('m6c2')">
+    <div class="concept-name">VIF & Multikollinearität</div>
+    <div class="concept-arrow">▼</div>
+  </div>
+  <div class="concept-body">
+    <div class="raster">
+      <div class="r was"><div class="r-label">🔵 Was ist das?</div><div class="r-body">
+        VIF = Variance Inflation Factor. Misst wie stark Varianz eines Koeffizienten durch Multikollinearität aufgebläht wird.<br><br>
+        <strong>VIF-Interpretation:</strong>
+        <table>
+          <tr><th>VIF-Wert</th><th>Bewertung</th></tr>
+          <tr><td>1</td><td>keine Kollinearität</td></tr>
+          <tr><td>1–5</td><td>moderat, akzeptabel</td></tr>
+          <tr><td>5–10</td><td>hoch, problematisch</td></tr>
+          <tr><td>> 10</td><td>schwere Multikollinearität → handeln!</td></tr>
+        </table>
+        <pre><code>from statsmodels.stats.outliers_influence import variance_inflation_factor
+
+vif_data = pd.DataFrame()
+vif_data["feature"] = X.columns
+vif_data["VIF"] = [variance_inflation_factor(X.values, i)
+                   for i in range(X.shape[1])]
+print(vif_data)</code></pre>
+        <strong>Bei VIF > 10:</strong> Variable entfernen, Ridge Regression, PCA.
+      </div></div>
+      <div class="r wann"><div class="r-label">🟢 Wann & Warum?</div><div class="r-body">
+        Multikollinearität = Prädiktoren stark korreliert → Koeffizienten instabil, Standardfehler aufgebläht → t-Tests unzuverlässig.<br><br>
+        VIF für JEDE Prädiktorvariable berechnen! VIF = 1/(1-R²_j) wobei R²_j = R² wenn Variable j durch alle anderen erklärt wird.
+      </div></div>
+      <div class="r nicht"><div class="r-label">🟠 Wann NICHT?</div><div class="r-body">
+        VIF-Grenzwert nicht starr: manche Domänen tolerieren VIF bis 5, andere bis 10. Kontext beachten.<br><br>
+        Cond. No. > 30 in OLS-Summary = auch Hinweis auf Multikollinearität.
+      </div></div>
+      <div class="r esel"><div class="r-label">🟣 Eselsbrücke</div><div class="r-body">
+        <strong>VIF = "Varianz Inflation Faktor"</strong>: Wie oft ist Varianz aufgebläht?<br>
+        VIF = 5 → Varianz 5× größer als ohne Kollinearität.<br><br>
+        Grenze: <strong>VIF > 10 = Problem, VIF > 5 = schauen</strong>
+      </div></div>
+    </div>
+  </div>
+</div>
+
+<div class="concept" id="m6c3">
+  <div class="concept-hdr" onclick="toggleC('m6c3')">
+    <div class="concept-name">Heteroskedastizität & Robuste Standardfehler</div>
+    <div class="concept-arrow">▼</div>
+  </div>
+  <div class="concept-body">
+    <div class="raster">
+      <div class="r was"><div class="r-label">🔵 Was ist das?</div><div class="r-body">
+        Homoskedastizität = Varianz der Residuen konstant über alle Werte. OLS-Annahme!<br>
+        Heteroskedastizität = Varianz der Residuen NICHT konstant (z.B. steigt mit X).<br><br>
+        <strong>Tests:</strong>
+        <table>
+          <tr><th>Test</th><th>H0</th><th>Entscheidung</th></tr>
+          <tr><td><strong>Breusch-Pagan</strong></td><td>Homoskedastizität</td><td>p &lt; .05 → Heterosked. vorhanden</td></tr>
+          <tr><td><strong>White-Test</strong></td><td>Homoskedastizität</td><td>p &lt; .05 → Heterosked. vorhanden</td></tr>
+        </table>
+        <pre><code>from statsmodels.stats.diagnostic import het_breuschpagan, het_white
+
+# Breusch-Pagan
+lm, lm_p, fval, f_p = het_breuschpagan(model.resid, model.model.exog)
+print(f'Breusch-Pagan p={lm_p:.4f}')  # p < 0.05 = Heterosked.
+
+# White-Test
+white_stat, white_p, _, _ = het_white(model.resid, model.model.exog)
+print(f'White-Test p={white_p:.4f}')</code></pre>
+        <strong>Lösung: Robuste Standardfehler (HC3):</strong>
+        <pre><code># HC3 = Heteroskedasticity-Consistent SE (empfohlen)
+model_robust = sm.OLS(y, X).fit(cov_type='HC3')
+print(model_robust.summary())
+
+# Koeffizienten bleiben GLEICH
+# Nur Standardfehler, t-Werte, p-Werte ändern sich</code></pre>
+      </div></div>
+      <div class="r wann"><div class="r-label">🟢 Wann & Warum?</div><div class="r-body">
+        Heteroskedastizität → OLS-Standardfehler falsch → t-Tests und p-Werte unzuverlässig → Fehlentscheidungen bei Signifikanz.<br><br>
+        HC3 robuste SE: korrigiert Standardfehler ohne Koeffizienten zu verändern. Empfehlung bei Heteroskedastizität.<br><br>
+        Log-Transformation der abhängigen Variable kann Heteroskedastizität reduzieren (wenn Streuung proportional zum Mittelwert ist).
+      </div></div>
+      <div class="r nicht"><div class="r-label">🟠 Wann NICHT?</div><div class="r-body">
+        Breusch-Pagan nur für lineare Heteroskedastizität. White-Test allgemeiner (quadratische Terme).<br><br>
+        HC3 korrigiert SE, aber behebt nicht die zugrunde liegende Modellmissspecifikation.
+      </div></div>
+      <div class="r esel"><div class="r-label">🟣 Eselsbrücke</div><div class="r-body">
+        <strong>Homo = gleichmäßig (Varianz konstant)</strong><br>
+        <strong>Hetero = verschieden (Varianz variiert)</strong><br><br>
+        HC3 = "Heterosked-Consistent, dritte Version"<br>
+        Merke: <strong>HC3 ändert NUR SE, nie Koeffizienten!</strong>
+      </div></div>
+    </div>
+  </div>
+</div>
+
+<div class="concept" id="m6c4">
+  <div class="concept-hdr" onclick="toggleC('m6c4')">
+    <div class="concept-name">Air Quality & NYC Taxi — Reale Datenbereinigung</div>
+    <div class="concept-arrow">▼</div>
+  </div>
+  <div class="concept-body">
+    <div class="raster">
+      <div class="r was"><div class="r-label">🔵 Was ist das?</div><div class="r-body">
+        <strong>Air Quality Dataset (UCI ML Repository):</strong>
+        <pre><code># Problem 1: Komma als Dezimaltrennzeichen (europäisch)
+df['CO(GT)'] = df['CO(GT)'].str.replace(',', '.').astype(float)
+
+# Problem 2: -200 = fehlend (nicht NaN!)
+df.replace(-200, np.nan, inplace=True)
+
+# Problem 3: Datum+Uhrzeit zusammenführen
+df['DateTime'] = pd.to_datetime(df['Date'] + ' ' + df['Time'],
+                                format='%d/%m/%Y %H.%M.%S')
+df.set_index('DateTime', inplace=True)</code></pre>
+        <strong>NYC Taxi Dataset:</strong>
+        <pre><code># Parquet-Format lesen (effizient für große Daten)
+df = pd.read_parquet('yellow_taxi.parquet')
+
+# Feature Engineering
+df['duration_min'] = (df['tpep_dropoff_datetime'] -
+                      df['tpep_pickup_datetime']).dt.total_seconds() / 60
+df['avg_speed'] = df['trip_distance'] / (df['duration_min'] / 60)
+
+# Outlier-Filter
+df = df[(df['duration_min'] > 1) & (df['duration_min'] < 180)]
+df = df[df['trip_distance'] > 0]
+df = df[df['avg_speed'] < 100]  # km/h Limit</code></pre>
+      </div></div>
+      <div class="r wann"><div class="r-label">🟢 Wann & Warum?</div><div class="r-body">
+        Air Quality: typisches Problem bei CSV-Export aus Excel (Komma/Punkt). Numerische Operationen auf String-Spalten schlagen fehl → zuerst konvertieren.<br><br>
+        Parquet: effizientes Spaltenformat für große Daten. Schnelleres Lesen als CSV. Datentypen bleiben erhalten (kein Komma-Problem!)<br><br>
+        Feature Engineering vor Regression: duration_min und avg_speed sind ABGELEITETE Features die bessere Prädiktoren sein können als rohe Timestamps.
+      </div></div>
+      <div class="r nicht"><div class="r-label">🟠 Wann NICHT?</div><div class="r-body">
+        Outlier-Filter nicht blind anwenden: Prüfen ob Ausreißer echte Daten oder Fehler sind. NYC Taxi: Trip > 180 Min könnte echter Trip zu Flughafen sein.<br><br>
+        avg_speed > 100: könnte echter Fehler (falsche Zeit) oder Motorsportveranstaltung sein.
+      </div></div>
+      <div class="r esel"><div class="r-label">🟣 Eselsbrücke</div><div class="r-body">
+        <strong>Air Quality: "Komma, Minus-200, Datum zusammen"</strong><br>
+        Drei Cleaning-Schritte merken: Separator → Sentinel → Timestamp<br><br>
+        <strong>Taxi: "Parquet, dauer, speed, filter"</strong><br>
+        Read → Feature Eng → Filter Outlier
+      </div></div>
+    </div>
+
+    <h3>Common Method Bias (CMB)</h3>
+    <div class="info">
+      <strong>Was:</strong> Verzerrung durch gleiche Messmethode für Prädiktor UND Outcome (z.B. Selbstauskunft-Fragebogen).<br>
+      <strong>Problem:</strong> Korrelationen zwischen Variablen künstlich erhöht (Halo-Effekt, soziale Erwünschtheit).<br>
+      <strong>Harman's Single Factor Test:</strong> EFA mit 1 Faktor erzwingen. Wenn > 50% Varianz durch einen Faktor erklärt → CMB Problem.<br>
+      <strong>Lösung:</strong> Verschiedene Quellen (Fremdauskunft + Selbstauskunft), Time-lagged Design.
+    </div>
+  </div>
+</div>
+
+</div><!-- /learn -->
+
+<div id="m6-flash" style="display:none">
+  <div class="info">Karte anklicken zum Umdrehen.</div>
+  <div class="fc-grid" id="m6fcGrid"></div>
+</div>
+
+<div id="m6-quiz" style="display:none">
+  <div class="quiz-wrap" id="m6QuizWrap"></div>
+</div>
+
+<div id="m6-transfer" style="display:none">
+  <div class="transfer-box">
+    <div class="transfer-label">🚀 Transferfrage — Modul 6</div>
+    <div class="transfer-q">Du analysierst den CPlus-Datensatz (Mitarbeiterbefragung, n=500):
+- OLS Regression: Jobzufriedenheit ~ Work-Life-Balance + Gehalt + Teamklima
+- R² = 0.42, Adj. R² = 0.41, F(3,496) = 119.3, p &lt; .001
+- VIF: Work-Life-Balance=2.1, Gehalt=1.8, Teamklima=8.9
+- Breusch-Pagan: p = 0.003
+- 67 Zeilen haben fehlende Werte (-66 oder NaN nach Konvertierung)
+- Bei msno.heatmap() siehst du: Spalten "Gehalt" und "Teamklima" fehlen oft gemeinsam
+
+▶ Interpretiere R², Adj. R² und F-Test.
+▶ Was sagst du zu VIF = 8.9 für Teamklima? Was tun?
+▶ Breusch-Pagan p = 0.003. Was bedeutet das? Was ist deine Lösung?
+▶ Was lässt das gemeinsame Fehlen von "Gehalt" und "Teamklima" (heatmap) vermuten? MCAR/MAR/MNAR?
+▶ Was ist HC3 und warum ändert es die Koeffizienten NICHT?</div>
+    <textarea class="transfer-ta" id="m6ta" placeholder="Schreibe deine Antwort hier..."></textarea>
+    <div class="transfer-actions">
+      <button class="btn btn-yellow" onclick="m6_showModel()">💡 Musterlösung</button>
+      <span id="doneBadge_6"></span>
+      <button class="btn btn-green" id="unlockBtn_6" onclick="DAN.completeModule(6)">✅ Plattform abschließen — Prüfung ready!</button>
+    </div>
+    <div class="model-answer" id="m6model">
+      <div class="model-label">Musterlösung:</div>
+      <strong>R², Adj. R², F-Test:</strong><br>
+      R² = 0.42 → Modell erklärt 42% der Varianz in Jobzufriedenheit. Adj. R² = 0.41 (nur 1 Punkt unter R²) → kaum Overfitting, alle drei Prädiktoren tragen bei. F(3,496) = 119.3, p &lt; .001 → Gesamtmodell signifikant besser als Nullmodell (H0: alle β = 0 verworfen).<br><br>
+      <strong>VIF = 8.9 für Teamklima:</strong><br>
+      Hoch! Zwischen 5 und 10 = problematisch. Teamklima korreliert stark mit anderen Prädiktoren (v.a. Work-Life-Balance?). Standardfehler des Teamklima-Koeffizienten aufgebläht → t-Test unzuverlässig. Optionen: (1) Teamklima entfernen wenn konzeptuell redundant, (2) zusammenführen mit korrelierendem Prädiktor (Summen-Score), (3) Ridge Regression.<br><br>
+      <strong>Breusch-Pagan p = 0.003:</strong><br>
+      p &lt; .05 → H0 (Homoskedastizität) verworfen → Heteroskedastizität vorhanden. OLS Standardfehler falsch → p-Werte der Koeffizienten unzuverlässig. Lösung: Robuste Standardfehler HC3 verwenden:<br>
+      <code>model_robust = sm.OLS(y, X).fit(cov_type='HC3')</code><br><br>
+      <strong>Gemeinsames Fehlen (heatmap) → MAR:</strong><br>
+      Wenn zwei Spalten oft gemeinsam fehlen, hängt das Fehlen einer Variable vom Fehlen einer anderen ab — das ist MAR (Missing At Random, relativ). Das Fehlen hängt von anderen beobachtbaren Variablen ab (z.B. Gehaltsklasse), nicht vom fehlenden Wert selbst. → Multiple Imputation empfohlen (nicht Listwise Deletion!)<br><br>
+      <strong>HC3 — warum keine Koeffizientenänderung?</strong><br>
+      HC3 = Heteroskedasticity-Consistent Covariance Matrix, Variante 3 (MacKinnon-White 1985). Korrigiert die Schätzung der Kovarianzmatrix der Koeffizienten, nicht die Koeffizienten selbst. OLS-Schätzer β = (X'X)⁻¹X'y bleibt unverändert. Nur die Schätzung der Varianz von β wird korrigiert → veränderte SE → veränderte t-Statistiken und p-Werte. Koeffizienten bleiben: "beste lineare unverzerrte Schätzer" (BLUE unter Gauss-Markov — auch bei Heteroskedastizität wenn n groß).
+    </div>
+  </div>
+</div>
+
+<script>
+const m6flash = [
+  {q:'Was ist MCAR?', a:'Missing Completely At Random — Fehlen komplett zufällig, unabhängig von allen Variablen. Bsp: Serverausfall. Listwise Deletion OK.'},
+  {q:'Was ist MAR?', a:'Missing At Random — Fehlen hängt von ANDEREN beobachtbaren Variablen ab (nicht vom fehlenden Wert selbst). Multiple Imputation empfohlen.'},
+  {q:'Was zeigt msno.heatmap()?', a:'Korrelation des Fehlens zwischen Variablen. Hohe Korrelation = wenn A fehlt, fehlt oft auch B. Hinweis auf MAR-Mechanismus.'},
+  {q:'VIF = 8.9 — was tun?', a:'Problematisch (5–10 = hoch). Multikollinearität. Optionen: Variable entfernen, zusammenführen, Ridge Regression. VIF > 10 = schwerwiegend.'},
+  {q:'Breusch-Pagan p = 0.003 — Bedeutung?', a:'p < .05 → Heteroskedastizität nachgewiesen. OLS Standardfehler falsch. Lösung: HC3 robuste Standardfehler. sm.OLS(y,X).fit(cov_type=\'HC3\')'},
+  {q:'Was ändert HC3?', a:'Nur die Standardfehler (und damit t-Werte und p-Werte). Koeffizienten selbst bleiben UNVERÄNDERT. HC3 = Heteroskedasticity-Consistent SE.'},
+  {q:'Wie liest man Parquet in Python?', a:'pd.read_parquet(\'datei.parquet\') — kein str.replace() nötig, Datentypen bleiben erhalten. Schneller und effizienter als CSV für große Daten.'},
+  {q:'-200 im Air Quality Dataset — was bedeutet es?', a:'Sentinel-Wert für fehlende Daten (nicht echter Messwert). Muss zu NaN konvertiert werden: df.replace(-200, np.nan, inplace=True)'},
+  {q:'Was ist Common Method Bias?', a:'Verzerrung wenn Prädiktor und Outcome mit gleicher Methode gemessen (beide Selbstauskunft). Korrelationen künstlich erhöht. Test: Harman\'s Single Factor Test (> 50% Varianz = Problem).'},
+  {q:'Durbin-Watson Wert ≈ 2 — was bedeutet das?', a:'Keine Autokorrelation der Residuen. DW = 2 ideal. DW → 0 = positive Autokorr. DW → 4 = negative Autokorr. Wichtig bei Zeitreihendaten.'},
+];
+
+const m6quiz = [
+  {q:'Welcher Missing-Typ liegt vor wenn Hochverdiener ihr Einkommen nicht angeben?', opts:['MCAR','MAR','MNAR','Random'], c:2, exp:'MNAR (Missing Not At Random) — das Fehlen hängt vom fehlenden Wert SELBST ab (das Einkommen ist hoch, deswegen fehlt der Eintrag).'},
+  {q:'Breusch-Pagan Test ergibt p = 0.21. Was bedeutet das?', opts:['Heteroskedastizität vorhanden','Homoskedastizität OK — keine Verletzung','Multikollinearität','Normalverteilung verletzt'], c:1, exp:'p = 0.21 > 0.05 → H0 (Homoskedastizität) beibehalten → Varianz der Residuen konstant → OLS Standardfehler korrekt.'},
+  {q:'VIF = 12 für Variable X. Was tun?', opts:['Akzeptieren — unter 15','Variable X entfernen oder transformieren','HC3 anwenden','Listwise Deletion'], c:1, exp:'VIF > 10 = schwere Multikollinearität. X korreliert stark mit anderen Prädiktoren. Optionen: entfernen, Ridge Regression, PCA. HC3 hilft bei Heteroskedastizität, nicht Multikollinearität.'},
+  {q:'msno.matrix() zeigt dass Zeilen 100-200 immer alle NaN haben. Was deutet das an?', opts:['MCAR','MAR','MNAR','Fehlende Werte zufällig'], c:1, exp:'Wenn ein Zeitblock komplett fehlt (Zeilen 100-200 zusammen), dann ist das Fehlen mit dem Zeitpunkt korreliert (eine beobachtbare Variable) → MAR. Bei MCAR wären die NaN zufällig verteilt.'},
+  {q:'Was passiert mit Koeffizienten wenn HC3 genutzt wird?', opts:['Alle Koeffizienten steigen','Nur signifikante Koeffizienten ändern sich','Koeffizienten bleiben gleich, nur SE ändern sich','Adj. R² steigt'], c:2, exp:'HC3 korrigiert nur die Varianz-Kovarianz-Matrix der Schätzer (Standardfehler). Die β-Koeffizienten selbst stammen aus OLS-Minimierung und bleiben identisch.'},
+  {q:'Air Quality: Spalte CO(GT) enthält "1,5" als String. Was zuerst?', opts:['astype(float) direkt','str.replace(\',\',\'.\'  ) dann astype(float)','replace(-200, NaN)','pd.to_datetime()'], c:1, exp:'Komma als Dezimaltrennzeichen (europäisch) zuerst durch Punkt ersetzen, dann zu float konvertieren. Sonst: ValueError. Dann erst auf -200 prüfen.'},
+];
+
+function m6_tab(name, btn) {
+  ['learn','flash','quiz','transfer'].forEach(t => {
+    document.getElementById('m6-'+t).style.display = t===name?'block':'none';
+  });
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (name==='flash') m6_renderFlash();
+  if (name==='quiz') m6_startQuiz();
+}
+function m6_renderFlash() {
+  document.getElementById('m6fcGrid').innerHTML = m6flash.map((c,i) => `
+    <div class="fc" onclick="this.classList.toggle('flipped')">
+      <div class="fc-inner"><div class="fc-front">${c.q}</div><div class="fc-back">${c.a}</div></div>
+    </div>`).join('');
+}
+let m6qi=0, m6ans=false;
+function m6_startQuiz() { m6qi=0; m6ans=false; m6_renderQuiz(); }
+function m6_renderQuiz() {
+  const wrap=document.getElementById('m6QuizWrap');
+  if (m6qi>=m6quiz.length) {
+    wrap.innerHTML=`<div style="text-align:center;padding:40px">
+      <div style="font-size:2.5rem">🏆</div>
+      <div style="font-weight:700;font-size:1.2rem;margin:10px 0">Alle Module geschafft!</div>
+      <div style="color:var(--muted);margin-bottom:20px">Beantworte noch die Transferfrage und du bist prüfungsbereit.</div>
+      <button class="btn btn-purple" onclick="m6_tab('transfer',document.querySelectorAll('.tab-btn')[3])">→ Finale Transferfrage</button>
+      <button class="btn btn-ghost" style="background:var(--border);color:var(--text);margin-left:8px" onclick="m6_startQuiz()">↺ Nochmal</button></div>`; return;
+  }
+  const q=m6quiz[m6qi];
+  wrap.innerHTML=`<div class="quiz-progress">Frage ${m6qi+1}/${m6quiz.length}</div>
+    <div class="quiz-q">${q.q}</div>
+    <div class="quiz-opts">${q.opts.map((o,i)=>`<button class="opt" id="m6o${i}" onclick="m6_ans(${i},${q.c})">${String.fromCharCode(65+i)}. ${o}</button>`).join('')}</div>
+    <div class="quiz-fb" id="m6fb"></div>
+    <div class="quiz-nav" id="m6nav"><button class="btn btn-purple" onclick="m6qi++;m6ans=false;m6_renderQuiz()">Nächste →</button></div>`;
+}
+function m6_ans(ch,co) {
+  if(m6ans)return; m6ans=true;
+  for(let i=0;i<5;i++){const e=document.getElementById('m6o'+i);if(!e)continue;e.disabled=true;if(i===co)e.classList.add('correct');else if(i===ch)e.classList.add('wrong');}
+  const q=m6quiz[m6qi],fb=document.getElementById('m6fb');
+  fb.classList.add('show',ch===co?'ok':'bad');
+  fb.innerHTML=(ch===co?'✓ Richtig! ':'✗ Falsch. ')+(q.exp||'');
+  document.getElementById('m6nav').classList.add('show');
+}
+function m6_showModel() { document.getElementById('m6model').classList.toggle('show'); }
+(function(){
+  if(window.DAN&&DAN.isDone(6)){
+    const b=document.getElementById('doneBadge_6');if(b)b.innerHTML='<span class="done-badge">🏆 Plattform abgeschlossen!</span>';
+    const u=document.getElementById('unlockBtn_6');if(u)u.style.display='none';
+  }
+})();
+</script>

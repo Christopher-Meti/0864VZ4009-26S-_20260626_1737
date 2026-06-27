@@ -1,0 +1,275 @@
+<div class="mod-tag">Modul 3</div>
+<div class="mod-title">Tokenisierung & Normalisierung</div>
+<div class="mod-sub">Stemming · Lemmatisierung · Overstemming · Linguistische Einheiten · Text-Preprocessing Pipeline</div>
+
+<div class="mode-tabs">
+  <button class="tab-btn active" onclick="m3_tab('learn',this)">📖 Lernen</button>
+  <button class="tab-btn" onclick="m3_tab('flash',this)">🃏 Flashcards</button>
+  <button class="tab-btn" onclick="m3_tab('quiz',this)">🎯 Quiz</button>
+  <button class="tab-btn" onclick="m3_tab('transfer',this)">🚀 Transferfrage</button>
+</div>
+
+<div id="m3-learn">
+
+<div class="concept open" id="m3c0">
+  <div class="concept-hdr" onclick="toggleC('m3c0')">
+    <div class="concept-name">Stemming vs. Lemmatisierung</div>
+    <div class="concept-arrow">▼</div>
+  </div>
+  <div class="concept-body">
+    <div class="raster">
+      <div class="r was"><div class="r-label">🔵 Was ist das?</div><div class="r-body">
+        Beide reduzieren Wortformen auf eine Grundform:<br><br>
+        <table>
+          <tr><th></th><th>Stemming</th><th>Lemmatisierung</th></tr>
+          <tr><td><strong>Methode</strong></td><td>regelbasiert, Endung abschneiden</td><td>Wörterbuch + Kontext</td></tr>
+          <tr><td><strong>Output</strong></td><td>oft kein echtes Wort</td><td>immer echtes Wort</td></tr>
+          <tr><td><strong>Wortart</strong></td><td>ignoriert</td><td>berücksichtigt</td></tr>
+          <tr><td><strong>Geschwindigkeit</strong></td><td>schnell</td><td>langsamer</td></tr>
+          <tr><td><strong>Beispiel</strong></td><td>"spielend" → "spiel"</td><td>"spielte" → "spielen"</td></tr>
+          <tr><td><strong>Python</strong></td><td>SnowballStemmer, PorterStemmer</td><td>spaCy, NLTK WordNetLemmatizer</td></tr>
+        </table>
+        <div class="warn" style="margin-top:8px">
+          <strong>Overstemming:</strong> zu viel abgeschnitten → verschiedene Wörter bekommen gleichen Stamm ("Bank" + "Bänke" → "bank")<br>
+          <strong>Understemming:</strong> zu wenig → gleiche Wörter behalten verschiedene Formen
+        </div>
+      </div></div>
+      <div class="r wann"><div class="r-label">🟢 Wann & Warum?</div><div class="r-body">
+        <strong>Stemming:</strong> Topic Modeling, Suchmaschinen, wenn Geschwindigkeit > Präzision. Ressourcensparend.<br><br>
+        <strong>Lemmatisierung:</strong> Sentiment-Analyse, NER, wenn Wortbedeutung wichtig ist. Wenn spaCy/NLTK verfügbar.<br><br>
+        Im Preprocessing-Notebook:<br>
+        <pre><code># NLTK Stemming (Deutsch)
+from nltk.stem import SnowballStemmer
+stemmer = SnowballStemmer("german")
+
+# spaCy Lemmatisierung
+import spacy
+nlp = spacy.load("de_core_news_sm")
+doc = nlp("spielte")
+[token.lemma_ for token in doc]  # → ["spielen"]</code></pre>
+      </div></div>
+      <div class="r nicht"><div class="r-label">🟠 Wann NICHT?</div><div class="r-body">
+        <strong>Stemming NICHT</strong> bei Sentiment-Analyse: "nicht" könnte verändert werden → Negation geht verloren.<br><br>
+        <strong>Lemmatisierung NICHT</strong> wenn kein passendes Sprachmodell verfügbar (Deutsch braucht <code>de_core_news_sm</code>).<br><br>
+        Für Social-Media-Texte: Stemming oft problematisch weil viele nicht-standardisierte Wörter (#fail, lol) keine Stemming-Regeln haben.
+      </div></div>
+      <div class="r esel"><div class="r-label">🟣 Eselsbrücke</div><div class="r-body">
+        <strong>Stem = Hackebeil</strong> (grob, schnell, macht manchmal Brei).<br>
+        <strong>Lemma = Skalpell</strong> (präzise, aber teurer).<br><br>
+        Overstemming-Test: Führen zwei verschiedene Wörter zum gleichen Stamm? Dann ist das Hackebeil zu grob.
+      </div></div>
+    </div>
+  </div>
+</div>
+
+<div class="concept" id="m3c1">
+  <div class="concept-hdr" onclick="toggleC('m3c1')">
+    <div class="concept-name">Linguistische Einheiten: Phon/Phonem, Graph/Graphem, Morph/Morphem</div>
+    <div class="concept-arrow">▼</div>
+  </div>
+  <div class="concept-body">
+    <div class="raster">
+      <div class="r was"><div class="r-label">🔵 Was ist das?</div><div class="r-body">
+        Paare aus konkreter Instanz und abstrakter Kategorie:<br><br>
+        <table>
+          <tr><th>Konkret (Instanz)</th><th>Abstrakt (Kategorie)</th><th>Ebene</th></tr>
+          <tr><td><strong>Phon</strong></td><td><strong>Phonem</strong></td><td>Laut/Schall</td></tr>
+          <tr><td><strong>Graph</strong></td><td><strong>Graphem</strong></td><td>Schriftzeichen</td></tr>
+          <tr><td><strong>Morph</strong></td><td><strong>Morphem</strong></td><td>Bedeutungseinheit</td></tr>
+        </table><br>
+        <strong>Phonem</strong> = bedeutungsunterscheidende Lautkategorie: /p/ vs /b/ in "Pein"/"Bein"<br>
+        <strong>Graphem</strong> = bedeutungsunterscheidende Schriftzeichenkategorie<br>
+        <strong>Morphem</strong> = kleinste bedeutungstragende Einheit:<br>
+        "un-glück-lich" = 3 Morpheme: {un-} + {glück} + {-lich}
+      </div></div>
+      <div class="r wann"><div class="r-label">🟢 Wann & Warum?</div><div class="r-body">
+        Bei Erklärung von Tokenisierungsebenen:<br>
+        <ul>
+          <li>Zeichenebene → Graph-Level</li>
+          <li>Subwort-Level → Morphem-Level (BPE-Tokenizer)</li>
+          <li>Wortebene → Wortform-Level</li>
+        </ul>
+        Stemming operiert auf Morphem-Ebene (entfernt Suffixe).
+      </div></div>
+      <div class="r nicht"><div class="r-label">🟠 Wann NICHT?</div><div class="r-body">
+        Phon ≠ Phonem: Phon = akustisches Ereignis (konkret), Phonem = abstrakte Lautkategorie.<br>
+        Das "p" in "Pein" und "Spein" sind phonetisch verschieden (aspiriert vs. nicht), aber dasselbe Phonem /p/.
+      </div></div>
+      <div class="r esel"><div class="r-label">🟣 Eselsbrücke</div><div class="r-body">
+        <strong>-em Suffix = abstrakt</strong> (Phonem, Graphem, Morphem).<br>
+        Ohne -em = konkret (Phon, Graph, Morph).<br><br>
+        Wie "Art" vs. "Individuum": Phonem = Laut-Art, Phon = konkretes Laut-Individuum.
+      </div></div>
+    </div>
+  </div>
+</div>
+
+<div class="concept" id="m3c2">
+  <div class="concept-hdr" onclick="toggleC('m3c2')">
+    <div class="concept-name">Text-Preprocessing Pipeline</div>
+    <div class="concept-arrow">▼</div>
+  </div>
+  <div class="concept-body">
+    <div class="raster">
+      <div class="r was"><div class="r-label">🔵 Was ist das?</div><div class="r-body">
+        Standardschritte aus dem Preprocessing-Notebook:<br><br>
+        <ol>
+          <li>Text <strong>laden</strong> + Struktur erkennen</li>
+          <li><strong>Extraktion</strong>: Text vs. Metadaten trennen (split nach Delimiter "Text:")</li>
+          <li><strong>Kleinschreibung</strong>: <code>text.lower()</code></li>
+          <li><strong>Zeilenumbrüche entfernen</strong>: <code>' '.join(text.splitlines())</code></li>
+          <li><strong>@Mentions</strong>: <code>re.sub(r'@\w+', '', text)</code></li>
+          <li><strong>#Hashtags</strong>: <code>re.sub(r'#\w+', '', text)</code></li>
+          <li><strong>URLs</strong>: <code>re.sub(r'https?://\S+', '', text)</code></li>
+          <li><strong>Sonderzeichen</strong>: <code>re.sub(r'[^\w\s]', '', text)</code></li>
+          <li><strong>Mehrfachleerzeichen</strong>: <code>' '.join(text.split())</code></li>
+          <li><strong>Tokenisierung</strong></li>
+          <li><strong>Stoppwörter entfernen</strong></li>
+          <li><strong>Stemming/Lemmatisierung</strong></li>
+        </ol>
+      </div></div>
+      <div class="r wann"><div class="r-label">🟢 Wann & Warum?</div><div class="r-body">
+        Vor <em>jeder</em> NLP-Analyse. Welche Schritte nötig sind, hängt vom Task ab:<br><br>
+        <table>
+          <tr><th>Task</th><th>Besondere Überlegung</th></tr>
+          <tr><td>Topic Modeling</td><td>Stoppwörter entfernen, Stemming OK</td></tr>
+          <tr><td>Sentiment</td><td>KEINE Negationen entfernen, Emojis behalten</td></tr>
+          <tr><td>NER</td><td>Großschreibung behalten!</td></tr>
+          <tr><td>Klassifikation</td><td>je nach Feature-Engineering</td></tr>
+        </table>
+      </div></div>
+      <div class="r nicht"><div class="r-label">🟠 Wann NICHT?</div><div class="r-body">
+        <strong>Nicht blind alle Schritte anwenden!</strong><br>
+        Stoppwort-Entfernung schadet bei Sentiment ("nicht gut" → "gut").<br>
+        Satzzeichen-Entfernung schadet bei Satztokenisierung ("Dr. Müller" → "Dr" + "Müller").<br>
+        Lowercase schadet bei NER ("Apple" vs "apple").
+      </div></div>
+      <div class="r esel"><div class="r-label">🟣 Eselsbrücke</div><div class="r-body">
+        <strong>"Erst putzen, dann zerlegen, dann verfeinern."</strong><br><br>
+        Putzen = Sonderzeichen, URLs, Mentions raus.<br>
+        Zerlegen = Tokenisierung.<br>
+        Verfeinern = Stoppwörter, Stemming/Lemma.
+      </div></div>
+    </div>
+    <h3>Libraries im Vergleich</h3>
+    <table>
+      <tr><th>Library</th><th>Stärke</th><th>Deutsch</th><th>Beispiel</th></tr>
+      <tr><td><strong>NLTK</strong></td><td>Klassisch, viele Algorithmen</td><td>SnowballStemmer("german")</td><td><code>word_tokenize(text)</code></td></tr>
+      <tr><td><strong>spaCy</strong></td><td>Modern, schnell, NLP-Pipeline</td><td>de_core_news_sm</td><td><code>token.lemma_</code></td></tr>
+      <tr><td><strong>scikit-learn</strong></td><td>ML-Integration</td><td>—</td><td><code>CountVectorizer</code></td></tr>
+    </table>
+  </div>
+</div>
+
+</div><!-- end learn -->
+
+<div id="m3-flash" style="display:none">
+  <div class="info">Karte anklicken zum Umdrehen.</div>
+  <div class="fc-grid" id="m3fcGrid"></div>
+  <div class="fc-hint">Klicken = umdrehen</div>
+</div>
+
+<div id="m3-quiz" style="display:none">
+  <div class="quiz-wrap" id="m3QuizWrap"></div>
+</div>
+
+<div id="m3-transfer" style="display:none">
+  <div class="transfer-box">
+    <div class="transfer-label">🚀 Transferfrage — Modul 3</div>
+    <div class="transfer-q">Du bekommst einen rohen Reklamationstext:
+"Guten Tag***, mein Paket ist leider noch nich angekommen 😕.
+Tracking hängt seit 5 Tagen ==> auf 'im Verteilzentrum'.
+Hab extra EXPRESS gebucht!!! #fail @ShopSupport http://bit.ly/xyz"
+
+▶ Nenne 5 konkrete Bereinigungsschritte mit Python-Regex (in richtiger Reihenfolge).
+▶ Du willst Topic Modeling machen: Stemming oder Lemmatisierung? Begründe.
+▶ Was ist "Paket" auf morphematischer Ebene?
+▶ "noch nich" — welcher Dirty-Data-Typ aus Modul 1, und wie gehst du damit um?</div>
+    <textarea class="transfer-ta" id="m3ta" placeholder="Schreibe deine Antwort hier..."></textarea>
+    <div class="transfer-actions">
+      <button class="btn btn-yellow" onclick="m3_showModel()">💡 Musterlösung</button>
+      <span id="doneBadge_3"></span>
+      <button class="btn btn-green" id="unlockBtn_3" onclick="DAN.completeModule(3)">🔓 Abschließen & Modul 4 freischalten</button>
+    </div>
+    <div class="model-answer" id="m3model">
+      <div class="model-label">Musterlösung:</div>
+      <strong>Bereinigungsschritte:</strong><br>
+      1. <code>re.sub(r'@\w+', '', text)</code> — @Mentions entfernen<br>
+      2. <code>re.sub(r'#\w+', '', text)</code> — Hashtags entfernen<br>
+      3. <code>re.sub(r'https?://\S+', '', text)</code> — URLs entfernen<br>
+      4. <code>re.sub(r'[^\w\s]', '', text)</code> — Sonderzeichen (***,==>) entfernen<br>
+      5. <code>' '.join(text.split())</code> — Mehrfachleerzeichen reduzieren<br><br>
+      <strong>Stemming für Topic Modeling:</strong> ✓ — Topic Modeling braucht nur thematische Ähnlichkeit, nicht morphologische Präzision. Stemming ist schneller und reicht für "Paket", "Pakete", "Paketen" → alle zu "Paket". Lemmatisierung wäre besser bei Sentiment.<br><br>
+      <strong>"Paket" morphematisch:</strong> 1 Morphem — nicht zerlegbar in bedeutungstragende Einheiten. Unzusammengesetztes Wort. (Vgl. "Paket-bote" = 2 Morpheme: Paket + Bote)<br><br>
+      <strong>"noch nich" = Incorrect</strong> (Dirty Data: Tippfehler/"nich" statt "nicht"). Im Preprocessing: Tippfehler-Wörterbuch mit <code>re.sub()</code> ersetzen, oder ignorieren (Topic Modeling toleriert einzelne Tippfehler, da diese selten sind und wenig Gewicht bekommen).
+    </div>
+  </div>
+</div>
+
+<script>
+const m3flash = [
+  {q:'Was ist Overstemming?', a:'Zu viel abgeschnitten → verschiedene Wörter bekommen denselben Stamm. "Bank" und "Banken" OK, aber "Bank" (Geldinstitut) und "Bänke" (Sitzgelegenheit) bekommen selben Stamm → Bedeutungsverlust.'},
+  {q:'Was unterscheidet Phon von Phonem?', a:'Phon = konkrete Lautinstanz (akustisch messbar). Phonem = abstrakte Lautkategorie, die Bedeutung unterscheidet (/p/ vs /b/).'},
+  {q:'Warum lowercase() NICHT bei NER?', a:'Named Entity Recognition braucht Großschreibung: "Apple" (Firma) vs "apple" (Frucht). Lowercase macht beides ununterscheidbar.'},
+  {q:'Was macht SnowballStemmer("german")?', a:'Regelbasierter Stemmer für Deutsch — entfernt Suffixe nach festgelegten Regeln. Kein Wörterbuch nötig. Output: oft kein gültiges deutsches Wort.'},
+  {q:'Was macht token.lemma_ in spaCy?', a:'Gibt die Lemma-Form (Grundform) eines Tokens zurück. spaCy verwendet Wörterbuch + Kontext (Wortart). "spielte" → "spielen".'},
+  {q:'Was bedeutet "3 Morpheme" bei "unglücklich"?', a:'{un-} (Negationspräfix) + {glück} (Stamm) + {-lich} (Adjektivsuffix) = 3 bedeutungstragende Einheiten.'},
+  {q:'Welcher Preprocessing-Schritt schadet bei Sentiment?', a:'Stoppwörter entfernen kann Negationen zerstören ("nicht gut" → "gut"). Auch Satzzeichen entfernen kann "!" (Intensität) entfernen.'},
+  {q:'Was ist der Unterschied zwischen Wortform und Token?', a:'Wortform = Oberflächenform im Text ("spielte"). Token = kleinstes Verarbeitungselement (kann Subwort sein, oder Satzzeichen als eigenes Token).'},
+];
+
+const m3quiz = [
+  {q:'"spielend" → "spiel" (Stemmer). "Spielzeug" → "spiel" (selber Stemmer). Welcher Fehlertyp?', opts:['Understemming','Overstemming','Lemma-Fehler','Kein Fehler'], c:1, exp:'Overstemming: verschiedene Wörter bekommen denselben Stamm → semantische Unterscheidung geht verloren.'},
+  {q:'Welcher Schritt sollte bei Sentiment-Analyse WEGGELASSEN werden?', opts:['Lowercase','Stoppwörter entfernen','URLs entfernen','@Mentions entfernen'], c:1, exp:'"nicht gut" → nach Stoppwort-Entfernung nur noch "gut" → Sentiment komplett umgekehrt.'},
+  {q:'Was ist "un-" in "unglücklich" auf morphematischer Ebene?', opts:['Phonem','Graph','Morphem (Präfix)','Token'], c:2, exp:'Morphem = kleinste bedeutungstragende Einheit. "un-" ist ein gebundenes Morphem (Präfix, Negation).'},
+  {q:'spaCy Lemmatisierung braucht welches Modell für Deutsch?', opts:['de_core_news_sm','german_nlp','nltk_german','deu_core_sm'], c:0, exp:'spacy.load("de_core_news_sm") lädt das kleine deutsche Sprachmodell mit Lemmatisierung.'},
+  {q:'Was gibt re.sub(r\'@\\w+\', \'\', text) aus?', opts:['Entfernt alle @-Zeichen','Entfernt @Wort Kombinationen','Entfernt alle Wörter','Entfernt Sonderzeichen'], c:1, exp:'@\\w+ = @ gefolgt von einem oder mehr Wortzeichen → "@ShopSupport" wird entfernt.'},
+];
+
+function m3_tab(name, btn) {
+  ['learn','flash','quiz','transfer'].forEach(t => {
+    document.getElementById('m3-'+t).style.display = t===name?'block':'none';
+  });
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (name==='flash') m3_renderFlash();
+  if (name==='quiz') m3_startQuiz();
+}
+function m3_renderFlash() {
+  document.getElementById('m3fcGrid').innerHTML = m3flash.map((c,i) => `
+    <div class="fc" onclick="this.classList.toggle('flipped')">
+      <div class="fc-inner"><div class="fc-front">${c.q}</div><div class="fc-back">${c.a}</div></div>
+    </div>`).join('');
+}
+let m3qi=0, m3ans=false;
+function m3_startQuiz() { m3qi=0; m3ans=false; m3_renderQuiz(); }
+function m3_renderQuiz() {
+  const wrap = document.getElementById('m3QuizWrap');
+  if (m3qi >= m3quiz.length) {
+    wrap.innerHTML = `<div style="text-align:center;padding:40px"><div style="font-size:2.5rem">🎉</div><div style="font-weight:700;margin:10px 0">Quiz abgeschlossen!</div>
+      <button class="btn btn-purple" onclick="m3_tab('transfer',document.querySelectorAll('.tab-btn')[3])">→ Transferfrage</button>
+      <button class="btn btn-ghost" style="background:var(--border);color:var(--text);margin-left:8px" onclick="m3_startQuiz()">↺ Wiederholen</button></div>`; return;
+  }
+  const q = m3quiz[m3qi];
+  wrap.innerHTML = `<div class="quiz-progress">Frage ${m3qi+1}/${m3quiz.length}</div>
+    <div class="quiz-q">${q.q}</div>
+    <div class="quiz-opts">${q.opts.map((o,i)=>`<button class="opt" id="m3o${i}" onclick="m3_ans(${i},${q.c})">${String.fromCharCode(65+i)}. ${o}</button>`).join('')}</div>
+    <div class="quiz-fb" id="m3fb"></div>
+    <div class="quiz-nav" id="m3nav"><button class="btn btn-purple" onclick="m3qi++;m3ans=false;m3_renderQuiz()">Nächste →</button></div>`;
+}
+function m3_ans(ch, co) {
+  if (m3ans) return; m3ans=true;
+  for(let i=0;i<5;i++){const e=document.getElementById('m3o'+i);if(!e)continue;e.disabled=true;if(i===co)e.classList.add('correct');else if(i===ch)e.classList.add('wrong');}
+  const q=m3quiz[m3qi], fb=document.getElementById('m3fb');
+  fb.classList.add('show',ch===co?'ok':'bad');
+  fb.innerHTML=(ch===co?'✓ Richtig! ':'✗ Falsch. ')+(q.exp||'');
+  document.getElementById('m3nav').classList.add('show');
+}
+function m3_showModel() { document.getElementById('m3model').classList.toggle('show'); }
+(function(){
+  if(window.DAN&&DAN.isDone(3)){
+    const b=document.getElementById('doneBadge_3');if(b)b.innerHTML='<span class="done-badge">✅ Modul abgeschlossen!</span>';
+    const u=document.getElementById('unlockBtn_3');if(u)u.style.display='none';
+  }
+})();
+</script>
